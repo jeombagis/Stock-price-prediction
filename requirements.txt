@@ -7,6 +7,12 @@ xgboost==3.2.0
 lightgbm==4.6.0
 yfinance==1.4.1
 
+# Jupyter Notebook 실행 환경 (VS Code 등에서 노트북 구동 시 필수)
+ipykernel==7.2.0
+ipython==8.37.0
+jupyter_client==8.9.0
+jupyter_core==5.9.1
+
 # Mac 환경에서 XGBoost를 사용하기 위한 OpenMP 런타임 (필수)
 # pip로 직접 설치되지 않으므로 아래 명령어 중 하나로 시스템/가상환경에 설치해야 합니다:
 # 1) conda: conda install -c conda-forge llvm-openmp
