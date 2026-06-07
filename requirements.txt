@@ -1,0 +1,13 @@
+pandas==2.3.3
+numpy==2.2.6
+matplotlib==3.10.9
+seaborn==0.13.2
+scikit-learn==1.7.2
+xgboost==3.2.0
+lightgbm==4.6.0
+yfinance==1.4.1
+
+# Mac 환경에서 XGBoost를 사용하기 위한 OpenMP 런타임 (필수)
+# pip로 직접 설치되지 않으므로 아래 명령어 중 하나로 시스템/가상환경에 설치해야 합니다:
+# 1) conda: conda install -c conda-forge llvm-openmp
+# 2) homebrew: brew install libomp

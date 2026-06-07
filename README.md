@@ -7,7 +7,6 @@ Yahoo Finance API 사용
 그리고 향후 주가 예측 알고리즘 설계
 이후 백테스팅
 
-###실행 전 구글 드라이브 경로 설정 필요
 ##먼저 Data Extraction 한 후 Stock Classification 실행
 
 1차
