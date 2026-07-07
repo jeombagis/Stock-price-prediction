@@ -9,12 +9,9 @@ Yahoo Finance API 사용
 
 ##먼저 Data Extraction 한 후 Stock Classification 실행
 
-1차
 1. 일봉 차트 정보 조회
 2. Binary Classification 모델 구현 (오를지 내릴지)
 3. 테스트
 
-2차
-1. 분봉 차트 정보 조회
-2. Neural Network 구조 사용하여 Regression 모델 구현
-3. 테스트
+4. Neural Network 구조 사용하여 Regression 모델 구현
+5. 테스트

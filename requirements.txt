@@ -1,3 +1,4 @@
+# Miniconda 파이썬 가상환경 생성
 pandas==2.3.3
 numpy==2.2.6
 matplotlib==3.10.9
