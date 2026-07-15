@@ -1,4 +1,31 @@
-# Miniconda 파이썬 가상환경 생성
+# =======================================================================
+# [Mac 환경 완벽 설치 가이드]
+# 터미널(Terminal)을 열고 아래 명령어들을 1번부터 순서대로 실행해 주세요.
+# =======================================================================
+#
+# 1. Homebrew 설치 (Mac 패키지 관리자, 이미 설치되어 있다면 건너뛰세요)
+# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#
+# 2. Miniconda 설치
+# brew install --cask miniconda
+# conda init "$(basename "${SHELL}")"
+# *주의*: 위 명령어를 실행한 후 터미널을 완전히 종료했다가 다시 열어주세요.
+#
+# 3. Mac 환경에서 XGBoost/LightGBM 구동을 위한 OpenMP 설치 (필수)
+# brew install libomp
+#
+# 4. 파이썬 가상환경 생성 (이름: stock_pred, 파이썬 버전: 3.11)
+# conda create -n stock_pred python=3.11 -y
+#
+# 5. 가상환경 활성화
+# conda activate stock_pred
+#
+# 6. Python 필수 패키지 설치 (이 파일이 있는 폴더로 이동 후 실행)
+# pip install -r requirements.txt
+#
+# =======================================================================
+
+# 데이터 분석 및 머신러닝 필수 패키지
 pandas==2.3.3
 numpy==2.2.6
 matplotlib==3.10.9
@@ -13,8 +40,3 @@ ipykernel==7.2.0
 ipython==8.37.0
 jupyter_client==8.9.0
 jupyter_core==5.9.1
-
-# Mac 환경에서 XGBoost를 사용하기 위한 OpenMP 런타임 (필수)
-# pip로 직접 설치되지 않으므로 아래 명령어 중 하나로 시스템/가상환경에 설치해야 합니다:
-# 1) conda: conda install -c conda-forge llvm-openmp
-# 2) homebrew: brew install libomp
