@@ -1,4 +1,2 @@
 *.csv
-*.py
 *.DS_Store
-venv/
