@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, RefreshCw, Sliders, Search, Sparkles, ChevronDown } from 'lucide-react';
+import { TrendingUp, RefreshCw, Sliders, Search, Sparkles, ChevronDown, Scale } from 'lucide-react';
 import { AssetInfo } from '../types';
 
 interface HeaderProps {
@@ -7,6 +7,7 @@ interface HeaderProps {
   onSelectAsset: (assetId: string) => void;
   onRefresh: () => void;
   onOpenParams: () => void;
+  onOpenLegal?: () => void;
   isLoading: boolean;
   isSyncing?: boolean;
   presets: AssetInfo[];
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectAsset,
   onRefresh,
   onOpenParams,
+  onOpenLegal,
   isLoading,
   isSyncing = false,
   presets,
@@ -53,8 +55,8 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-black text-base sm:text-lg text-slate-900 tracking-tight">StockPredict AI</span>
-                <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-50 via-pink-50 to-amber-50 text-purple-700 border border-purple-200/70 flex items-center gap-1 shadow-2xs">
-                  <Sparkles className="w-2.5 h-2.5 text-purple-500 animate-pulse" /> Pro
+                <span className="text-[10px] uppercase font-black tracking-wider px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-50 via-purple-50 to-pink-50 text-purple-700 border border-purple-200/80 flex items-center gap-1 shadow-2xs">
+                  <Sparkles className="w-2.5 h-2.5 text-purple-500 animate-pulse" /> Beta
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 font-medium hidden sm:block">Ensemble & TimeSeries AI 주가 예측 시스템</p>
@@ -131,6 +133,17 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Action Buttons (Latest Data Sync & AI Model Retrain) */}
           <div className="flex items-center gap-2">
+            {onOpenLegal && (
+              <button
+                onClick={onOpenLegal}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-white/80 border border-white/90 text-slate-600 hover:text-slate-900 hover:bg-white shadow-xs transition backdrop-blur-md active:scale-95"
+                title="법적 고지, 저작권 및 면책 조항 열람"
+              >
+                <Scale className="w-3.5 h-3.5 text-purple-600" />
+                <span className="hidden sm:inline">면책조항</span>
+              </button>
+            )}
+
             <button
               onClick={onRefresh}
               disabled={isLoading || isSyncing}

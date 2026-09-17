@@ -6,13 +6,14 @@ import { StockChart } from './components/StockChart';
 import { FeatureImportance } from './components/FeatureImportance';
 import { BacktestTable } from './components/BacktestTable';
 import { ParameterModal } from './components/ParameterModal';
+import { LegalModal } from './components/LegalModal';
 import { api } from './services/api';
 import {
   AssetInfo,
   PredictionOverviewResponse,
   ChartResponse
 } from './types';
-import { AlertCircle, RefreshCw, Layers, CheckCircle2, X, Sparkles } from 'lucide-react';
+import { AlertCircle, RefreshCw, Layers, CheckCircle2, X, Sparkles, AlertTriangle } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [currentAsset, setCurrentAsset] = useState<string>('SnP500');
@@ -28,6 +29,7 @@ export const App: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isParamModalOpen, setIsParamModalOpen] = useState<boolean>(false);
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState<boolean>(false);
 
   // Auto-dismiss toast after 4s
   useEffect(() => {
@@ -130,6 +132,7 @@ export const App: React.FC = () => {
         onSelectAsset={handleSelectAsset}
         onRefresh={handleRefresh}
         onOpenParams={() => setIsParamModalOpen(true)}
+        onOpenLegal={() => setIsLegalModalOpen(true)}
         isLoading={loading}
         isSyncing={isSyncing}
         presets={presets}
@@ -156,6 +159,38 @@ export const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* Apple Liquid Glass Beta & Cautionary Notice Banner */}
+        <div className="liquid-glass rounded-3xl px-4 py-3 sm:px-5 sm:py-3.5 border border-amber-200/80 shadow-2xs backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 animate-in fade-in duration-200">
+          <div className="flex items-start sm:items-center gap-3 text-xs text-slate-700">
+            <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-amber-100 to-orange-100 text-amber-700 flex items-center justify-center flex-shrink-0 shadow-2xs border border-amber-200/60 mt-0.5 sm:mt-0">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="flex flex-wrap items-center gap-2 font-black text-slate-900">
+                <span className="text-amber-700 font-black tracking-wide">[BETA PREVIEW]</span>
+                <span>인공지능 주가 예측 서비스 베타 테스트 운영 안내</span>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+                본 시스템은 AI 앙상블 알고리즘 성능 검증을 위한 <strong>베타(Beta) 버전</strong>입니다. 제공되는 예측 확률과 방향 지표는 과거 시장 패턴을 분석한 통계적 추정치일 뿐이며, 특정 자산의 매수/매도 권유나 미래 수익을 절대 보장하지 않습니다. 모든 투자 결정 및 원금 손실 위험의 최종 책임은 투자자 본인에게 있습니다.
+                <button
+                  onClick={() => setIsLegalModalOpen(true)}
+                  className="inline-flex items-center text-amber-900 font-bold underline hover:text-amber-700 ml-1.5 transition"
+                >
+                  상세 면책 조항 및 저작권 고지 보기 →
+                </button>
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
+            <button
+              onClick={() => setIsLegalModalOpen(true)}
+              className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 text-amber-900 border border-amber-200 shadow-2xs hover:bg-amber-100 transition"
+            >
+              Beta Testing (면책조항)
+            </button>
+          </div>
+        </div>
+
         {/* Error Alert */}
         {error && (
           <div className="flex items-center gap-3 p-4 rounded-3xl bg-rose-50/80 backdrop-blur-xl border border-rose-200/80 text-rose-800 shadow-sm animate-in fade-in">
@@ -239,15 +274,34 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200/70 bg-white/60 backdrop-blur-xl py-6 text-center text-xs text-slate-500 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 space-y-1.5">
-          <p className="font-semibold text-slate-600">
-            Stock Price Prediction AI Engine | Powered by FastAPI, XGBoost, LightGBM, Scikit-Learn & React
+      {/* Legal & Disclaimer Modal */}
+      <LegalModal
+        isOpen={isLegalModalOpen}
+        onClose={() => setIsLegalModalOpen(false)}
+      />
+
+      {/* Footer with Comprehensive Cautionary Disclaimer */}
+      <footer className="border-t border-slate-200/70 bg-white/70 backdrop-blur-xl py-6 text-center text-xs text-slate-500 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 space-y-2.5">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span className="font-black text-slate-800">StockPredict AI</span>
+            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 text-amber-900 border border-amber-200 shadow-2xs">
+              BETA
+            </span>
+            <span className="text-slate-300 hidden sm:inline">|</span>
+            <span className="text-slate-500 font-medium">Powered by FastAPI, XGBoost, LightGBM, Scikit-Learn & React</span>
+          </div>
+          <p className="text-[11px] text-slate-400 max-w-3xl mx-auto leading-relaxed font-medium">
+            ⚠️ <strong>투자 유의사항 및 법적 면책 고지:</strong> 본 서비스는 머신러닝 예측 알고리즘 성능 검증을 위한 <strong>베타(Beta) 버전</strong>입니다. 산출된 예측 결과 및 지표는 통계적 추정치로서 미래의 금융 수익이나 원금을 보장하지 않으며, 특정 종목에 대한 투자 권유나 재정적 자문이 아닙니다. 금융 투자에는 원금 손실의 위험이 따르며 모든 투자 결과에 대한 책임은 본인에게 귀속됩니다.
           </p>
-          <p className="text-[11px] text-slate-400">
-            ⚠️ 본 예측 결과는 머신러닝 알고리즘에 의한 확률적 추정치이며, 투자 권유나 재정적 조언이 아닙니다. 실제 투자의 책임은 본인에게 있습니다.
-          </p>
+          <div className="pt-1 flex items-center justify-center gap-2">
+            <button
+              onClick={() => setIsLegalModalOpen(true)}
+              className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 underline transition flex items-center gap-1"
+            >
+              <span>법적 고지, 저작권 및 면책 조항 (Legal Disclaimer & Trademarks) 전문 열람</span>
+            </button>
+          </div>
         </div>
       </footer>
     </div>
