@@ -26,6 +26,7 @@ export interface PredictionOverviewResponse {
   ticker: string;
   base_date: string;
   target_date: string;
+  total_records?: number;
   latest_close: number;
   prev_close: number;
   daily_change_pct: number;
@@ -111,6 +112,7 @@ export interface RetrainRequest {
   threshold: number;
   train_split: number;
   fast_mode: boolean;
+  force_sync?: boolean;
 }
 
 export interface RetrainResponse {

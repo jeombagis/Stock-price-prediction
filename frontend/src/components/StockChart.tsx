@@ -31,42 +31,44 @@ export const StockChart: React.FC<StockChartProps> = ({ points, assetName, ticke
   const lastPoint = filteredPoints[filteredPoints.length - 1];
 
   return (
-    <div className="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 shadow-glass border border-white/90">
+    <div className="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 shadow-glass-specular border border-white/90">
       {/* Chart Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/70">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <ChartIcon className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-base font-extrabold text-slate-900 tracking-tight">기술적 주가 분석 & 보조지표 차트</h2>
-          <span className="text-xs text-slate-400 font-medium">({ticker})</span>
+          <div className="p-1.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100/80 shadow-2xs">
+            <ChartIcon className="w-4 h-4" />
+          </div>
+          <h2 className="text-base font-black text-slate-900 tracking-tight">기술적 주가 분석 & 보조지표 차트</h2>
+          <span className="text-xs text-slate-400 font-semibold">({ticker})</span>
         </div>
 
         <div className="flex items-center flex-wrap gap-2">
           {/* Bollinger Band Toggle */}
           <button
             onClick={() => setShowBB(!showBB)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition shadow-xs ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition shadow-2xs ${
               showBB 
-                ? 'bg-purple-50 text-purple-700 border-purple-200 shadow-purple-100/50'
-                : 'bg-white/80 text-slate-500 border-slate-200/80 hover:text-slate-900 hover:bg-white'
+                ? 'bg-purple-500 text-white border-purple-400 shadow-purple-500/20'
+                : 'bg-white/80 text-slate-500 border-white/90 hover:text-slate-900 hover:bg-white'
             }`}
           >
             볼린저 밴드 {showBB ? 'ON' : 'OFF'}
           </button>
 
           {/* Sub Indicator Tab */}
-          <div className="flex bg-slate-100/90 p-0.5 rounded-xl border border-slate-200/60 text-xs shadow-inner">
+          <div className="flex bg-slate-200/40 p-0.5 rounded-xl border border-white/80 text-xs shadow-inner backdrop-blur-md">
             <button
               onClick={() => setSubIndicator('RSI')}
-              className={`px-2.5 py-1 rounded-lg transition font-semibold ${
-                subIndicator === 'RSI' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+              className={`px-3 py-1 rounded-lg transition font-bold ${
+                subIndicator === 'RSI' ? 'bg-white/95 text-slate-900 shadow-sm border border-white/90' : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               RSI (14)
             </button>
             <button
               onClick={() => setSubIndicator('MACD')}
-              className={`px-2.5 py-1 rounded-lg transition font-semibold ${
-                subIndicator === 'MACD' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+              className={`px-3 py-1 rounded-lg transition font-bold ${
+                subIndicator === 'MACD' ? 'bg-white/95 text-slate-900 shadow-sm border border-white/90' : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               MACD
@@ -74,13 +76,13 @@ export const StockChart: React.FC<StockChartProps> = ({ points, assetName, ticke
           </div>
 
           {/* Range Selector */}
-          <div className="flex bg-slate-100/90 p-0.5 rounded-xl border border-slate-200/60 text-xs shadow-inner">
+          <div className="flex bg-slate-200/40 p-0.5 rounded-xl border border-white/80 text-xs shadow-inner backdrop-blur-md">
             {[30, 60, 90, 120].map((d) => (
               <button
                 key={d}
                 onClick={() => setRange(d)}
-                className={`px-2.5 py-1 rounded-lg transition font-semibold ${
-                  range === d ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                className={`px-2.5 py-1 rounded-lg transition font-bold ${
+                  range === d ? 'bg-white/95 text-slate-900 shadow-sm border border-white/90' : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
                 {d}일
@@ -96,11 +98,11 @@ export const StockChart: React.FC<StockChartProps> = ({ points, assetName, ticke
           <ComposedChart data={filteredPoints} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#059669" stopOpacity={0.22} />
+                <stop offset="5%" stopColor="#059669" stopOpacity={0.25} />
                 <stop offset="95%" stopColor="#059669" stopOpacity={0.0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
             <XAxis dataKey="date" stroke="#94a3b8" tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} />
             <YAxis
               domain={['auto', 'auto']}
@@ -111,15 +113,15 @@ export const StockChart: React.FC<StockChartProps> = ({ points, assetName, ticke
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(255, 255, 255, 0.94)',
-                backdropFilter: 'blur(16px)',
-                borderColor: 'rgba(226, 232, 240, 0.9)',
-                borderRadius: '1rem',
-                boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
+                backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                backdropFilter: 'blur(20px)',
+                borderColor: 'rgba(255, 255, 255, 0.95)',
+                borderRadius: '1.25rem',
+                boxShadow: '0 14px 35px -5px rgba(15, 23, 42, 0.08), 0 0 20px -3px rgba(175, 82, 222, 0.1)',
                 fontSize: '12px',
                 color: '#0f172a'
               }}
-              labelStyle={{ color: '#64748b', fontWeight: 700, marginBottom: '4px' }}
+              labelStyle={{ color: '#64748b', fontWeight: 800, marginBottom: '4px' }}
             />
 
             {/* Bollinger Bands */}
@@ -131,9 +133,9 @@ export const StockChart: React.FC<StockChartProps> = ({ points, assetName, ticke
             )}
 
             {/* Price Area & Line */}
-            <Area type="monotone" dataKey="close" stroke="#059669" strokeWidth={2.2} fillOpacity={1} fill="url(#priceGradient)" name="종가(Close)" />
-            <Line type="monotone" dataKey="ma20" stroke="#d97706" strokeWidth={1.8} dot={false} name="20일 이평선" />
-            <Line type="monotone" dataKey="ema5" stroke="#0284c7" strokeWidth={1.5} dot={false} name="EMA 5" />
+            <Area type="monotone" dataKey="close" stroke="#059669" strokeWidth={2.4} fillOpacity={1} fill="url(#priceGradient)" name="종가(Close)" />
+            <Line type="monotone" dataKey="ma20" stroke="#f97316" strokeWidth={1.8} dot={false} name="20일 이평선" />
+            <Line type="monotone" dataKey="ema5" stroke="#0ea5e9" strokeWidth={1.5} dot={false} name="EMA 5" />
           </ComposedChart>
         </ResponsiveContainer>
       </div>

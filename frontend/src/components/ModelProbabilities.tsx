@@ -39,10 +39,12 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Cpu className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-base font-extrabold text-slate-900 tracking-tight">AI 모델별 개별 예측 및 상승 확률</h2>
+          <div className="p-1.5 rounded-xl bg-purple-50 text-purple-600 border border-purple-100/80 shadow-2xs">
+            <Cpu className="w-4 h-4" />
+          </div>
+          <h2 className="text-base font-black text-slate-900 tracking-tight">AI 모델별 개별 예측 및 상승 확률</h2>
         </div>
-        <span className="text-xs text-slate-500 font-medium">5개 머신러닝 알고리즘 다각도 분석</span>
+        <span className="text-xs text-slate-400 font-semibold">5개 머신러닝 알고리즘 다각도 분석</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
@@ -59,12 +61,14 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
           return (
             <div
               key={name}
-              className={`liquid-glass glass-panel-hover rounded-2xl p-4 flex flex-col justify-between relative shadow-sm border border-white/80 backdrop-blur-xl ${
-                isMaster ? 'border-indigo-200/80 bg-gradient-to-b from-indigo-50/50 to-white/75 shadow-indigo-100/40' : ''
+              className={`liquid-glass glass-panel-hover rounded-3xl p-4 sm:p-5 flex flex-col justify-between relative shadow-sm border border-white/90 backdrop-blur-2xl ${
+                isMaster 
+                  ? 'border-purple-300/80 bg-gradient-to-b from-purple-50/30 via-white/80 to-white/95 shadow-intelligence-glow' 
+                  : ''
               }`}
             >
               {isMaster && (
-                <div className="absolute -top-2.5 right-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-[10px] font-bold text-white px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm ring-2 ring-white">
+                <div className="absolute -top-2.5 right-3 bg-gradient-to-r from-cyan-500 via-indigo-600 to-rose-500 text-[10px] font-black text-white px-3 py-0.5 rounded-full uppercase tracking-wider shadow-sm ring-2 ring-white">
                   Master Signal
                 </div>
               )}
@@ -72,11 +76,13 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
               <div>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-1.5">
-                    <Layers className={`w-4 h-4 ${meta.iconColor}`} />
-                    <span className="font-extrabold text-sm text-slate-900">{name}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-xl bg-slate-100/80 flex items-center justify-center border border-white/80 shadow-2xs">
+                      <Layers className={`w-3.5 h-3.5 ${meta.iconColor}`} />
+                    </div>
+                    <span className="font-black text-sm text-slate-900">{name}</span>
                   </div>
-                  <div className={`flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-lg border shadow-xs ${
+                  <div className={`flex items-center gap-1 text-xs font-black px-2 py-0.5 rounded-xl border shadow-2xs ${
                     isUp 
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80' 
                       : 'bg-rose-50 text-rose-700 border-rose-200/80'
@@ -86,20 +92,22 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-500 line-clamp-1 mb-3" title={meta.desc}>
+                <p className="text-[11px] text-slate-400 font-medium line-clamp-1 mb-3" title={meta.desc}>
                   {meta.fullName}
                 </p>
 
                 {/* Probability */}
-                <div className="space-y-1 mb-3">
+                <div className="space-y-1.5 mb-3">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-500 font-medium">상승 확률</span>
-                    <span className="font-mono font-bold text-slate-900">{probPct}%</span>
+                    <span className="text-slate-400 font-semibold">상승 확률</span>
+                    <span className="font-mono font-black text-slate-900">{probPct}%</span>
                   </div>
-                  <div className="h-2.5 w-full bg-slate-100/90 rounded-full overflow-hidden p-0.5 border border-slate-200/60 shadow-inner">
+                  <div className="h-2.5 w-full bg-slate-200/50 rounded-full overflow-hidden p-0.5 border border-white/80 shadow-inner">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        isUp ? 'bg-gradient-to-r from-teal-400 to-emerald-500' : 'bg-gradient-to-r from-rose-400 to-red-500'
+                        isUp 
+                          ? 'bg-gradient-to-r from-cyan-400 to-emerald-500' 
+                          : 'bg-gradient-to-r from-amber-400 to-rose-500'
                       }`}
                       style={{ width: `${detail.probability * 100}%` }}
                     />
@@ -108,9 +116,9 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
               </div>
 
               {/* Metrics Footer */}
-              <div className="pt-2.5 border-t border-slate-200/70 flex items-center justify-between text-[10px] text-slate-500">
-                <span>정확도: <strong className="text-slate-800 font-bold">{detail.accuracy ? `${(detail.accuracy * 100).toFixed(1)}%` : '-'}</strong></span>
-                <span>F1: <strong className="text-slate-800 font-bold">{detail.f1_score ? detail.f1_score.toFixed(3) : '-'}</strong></span>
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                <span>정확도: <strong className="text-slate-800 font-black">{detail.accuracy ? `${(detail.accuracy * 100).toFixed(1)}%` : '-'}</strong></span>
+                <span>F1: <strong className="text-slate-800 font-black">{detail.f1_score ? detail.f1_score.toFixed(3) : '-'}</strong></span>
               </div>
             </div>
           );
