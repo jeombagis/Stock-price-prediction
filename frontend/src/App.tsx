@@ -78,7 +78,19 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-gray-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="relative min-h-screen bg-[#f8fafc] text-slate-800 flex flex-col font-sans selection:bg-emerald-500 selection:text-white overflow-x-hidden">
+      {/* Apple Liquid Glass Ambient Light Orbs */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        {/* Top Left Sky / Cyan Orb */}
+        <div className="absolute -top-[15%] -left-[10%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-br from-sky-200/40 via-teal-100/30 to-transparent blur-3xl animate-aurora-1" />
+        {/* Top Right Mint / Emerald Orb */}
+        <div className="absolute top-[5%] -right-[15%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-bl from-emerald-100/50 via-cyan-100/30 to-transparent blur-3xl animate-aurora-2" />
+        {/* Center Bottom Lavender / Indigo Orb */}
+        <div className="absolute top-[45%] left-[25%] w-[45vw] h-[45vw] rounded-full bg-gradient-to-tr from-indigo-100/30 via-purple-100/20 to-transparent blur-3xl animate-aurora-1" />
+        {/* Bottom Subtle Peach Glow */}
+        <div className="absolute -bottom-[10%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-tl from-rose-100/30 via-amber-50/20 to-transparent blur-3xl" />
+      </div>
+
       {/* Navigation Header */}
       <Header
         currentAsset={currentAsset}
@@ -94,15 +106,15 @@ export const App: React.FC = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Error Alert */}
         {error && (
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 animate-in fade-in">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-400" />
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-rose-50/80 backdrop-blur-xl border border-rose-200/80 text-rose-800 shadow-sm animate-in fade-in">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600" />
             <div className="text-sm">
               <strong className="font-semibold">오류 발생: </strong>
               {error}
             </div>
             <button
               onClick={() => loadData(currentAsset)}
-              className="ml-auto text-xs underline hover:text-white text-rose-400 font-semibold"
+              className="ml-auto text-xs underline hover:text-rose-950 text-rose-700 font-semibold"
             >
               다시 시도
             </button>
@@ -113,14 +125,14 @@ export const App: React.FC = () => {
         {loading && !prediction && (
           <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-4">
             <div className="relative">
-              <div className="w-12 h-12 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin" />
+              <div className="w-14 h-14 rounded-full border-4 border-emerald-500/20 border-t-emerald-600 animate-spin" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Layers className="w-5 h-5 text-emerald-400" />
+                <Layers className="w-5 h-5 text-emerald-600" />
               </div>
             </div>
             <div className="text-center">
-              <p className="text-sm font-semibold text-white">AI 모델 데이터 분석 및 예측 수행 중...</p>
-              <p className="text-xs text-gray-400 mt-1">XGBoost, LightGBM, Random Forest 앙상블 파이프라인 연산 중</p>
+              <p className="text-sm font-bold text-slate-800">AI 모델 데이터 분석 및 예측 수행 중...</p>
+              <p className="text-xs text-slate-500 mt-1">XGBoost, LightGBM, Random Forest 앙상블 파이프라인 연산 중</p>
             </div>
           </div>
         )}
@@ -144,7 +156,7 @@ export const App: React.FC = () => {
                     ticker={chartData.ticker}
                   />
                 ) : (
-                  <div className="glass-panel rounded-2xl p-6 h-80 flex items-center justify-center text-sm text-gray-400">
+                  <div className="liquid-glass rounded-2xl p-6 h-80 flex items-center justify-center text-sm text-slate-400">
                     차트 데이터를 불러오는 중입니다...
                   </div>
                 )}
@@ -173,12 +185,12 @@ export const App: React.FC = () => {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-gray-800/80 bg-gray-950/60 py-6 text-center text-xs text-gray-500">
-        <div className="max-w-7xl mx-auto px-4 space-y-2">
-          <p className="font-medium text-gray-400">
+      <footer className="border-t border-slate-200/70 bg-white/60 backdrop-blur-xl py-6 text-center text-xs text-slate-500 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 space-y-1.5">
+          <p className="font-semibold text-slate-600">
             Stock Price Prediction AI Engine | Powered by FastAPI, XGBoost, LightGBM, Scikit-Learn & React
           </p>
-          <p className="text-[11px] text-gray-600">
+          <p className="text-[11px] text-slate-400">
             ⚠️ 본 예측 결과는 머신러닝 알고리즘에 의한 확률적 추정치이며, 투자 권유나 재정적 조언이 아닙니다. 실제 투자의 책임은 본인에게 있습니다.
           </p>
         </div>

@@ -4,38 +4,44 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        dark: {
-          900: '#0b0f19',
-          800: '#111827',
-          700: '#1f2937',
-          600: '#374151',
+        apple: {
+          canvas: '#f8fafc',
+          card: 'rgba(255, 255, 255, 0.72)',
+          border: 'rgba(255, 255, 255, 0.85)',
+          subtle: 'rgba(241, 245, 249, 0.6)',
         },
         bullish: {
-          DEFAULT: '#10b981', // green-500
-          light: '#34d399',
-          dark: '#059669',
+          DEFAULT: '#059669', // emerald-600
+          light: '#10b981',
+          dark: '#047857',
           bg: 'rgba(16, 185, 129, 0.1)',
         },
         bearish: {
-          DEFAULT: '#ef4444', // red-500
-          light: '#f87171',
-          dark: '#dc2626',
-          bg: 'rgba(239, 68, 68, 0.1)',
+          DEFAULT: '#e11d48', // rose-600
+          light: '#f43f5e',
+          dark: '#be123c',
+          bg: 'rgba(244, 63, 94, 0.1)',
         },
         accent: {
-          blue: '#3b82f6',
-          purple: '#8b5cf6',
-          cyan: '#06b6d4',
-          amber: '#f59e0b',
+          blue: '#2563eb',
+          purple: '#7c3aed',
+          cyan: '#0891b2',
+          amber: '#d97706',
+          indigo: '#4f46e5',
         }
       },
+      boxShadow: {
+        'glass-sm': '0 4px 20px -2px rgba(0, 0, 0, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.95)',
+        'glass': '0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95)',
+        'glass-lg': '0 20px 45px -10px rgba(0, 0, 0, 0.07), 0 8px 16px -4px rgba(0, 0, 0, 0.03), inset 0 1px 1px 0 rgba(255, 255, 255, 1)',
+        'glass-glow': '0 0 35px -5px rgba(59, 130, 246, 0.15)',
+      },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'Courier New', 'monospace'],
       }
     },
   },
