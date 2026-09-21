@@ -1,203 +1,368 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    background-color: #fbfcfe;
-    color: #0f172a;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  }
+:root {
+  /* Apple Neutral Palette */
+  --text-main: #1d1d1f;
+  --text-muted: #515154;
+  --text-dim: #86868b;
+  --bg-canvas: #f5f6fa;
+  
+  /* Apple System Tint Colors */
+  --apple-blue: #0071e3;
+  --apple-blue-hover: #0077ed;
+  --apple-blue-glow: rgba(0, 113, 227, 0.25);
+  
+  /* Financial Directional Tones */
+  --color-up: #e02424;
+  --color-up-bg: rgba(224, 36, 36, 0.08);
+  --color-up-border: rgba(224, 36, 36, 0.25);
+
+  --color-down: #059669;
+  --color-down-bg: rgba(5, 150, 105, 0.08);
+  --color-down-border: rgba(5, 150, 105, 0.25);
+
+  --color-sideways: #d97706;
+  --color-sideways-bg: rgba(217, 119, 6, 0.08);
+  --color-sideways-border: rgba(217, 119, 6, 0.25);
+
+  /* Apple Liquid Glass White Material Tokens */
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-bg-hover: rgba(255, 255, 255, 0.94);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.62);
+  --glass-bg-pill: rgba(255, 255, 255, 0.85);
+  
+  --glass-border: rgba(255, 255, 255, 0.92);
+  --glass-border-subtle: rgba(0, 0, 0, 0.07);
+  --glass-border-focus: #0071e3;
+  
+  --glass-blur: blur(28px) saturate(180%);
+  --glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.02);
+  --glass-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 2px 6px 0 rgba(0, 0, 0, 0.02);
+  --glass-shadow-hover: 0 16px 40px -4px rgba(0, 0, 0, 0.07), 0 6px 16px -2px rgba(0, 0, 0, 0.03), inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+  
+  /* Apple Fluid Spring Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-canvas);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Pretendard Variable", Pretendard, "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  min-height: 100vh;
+  position: relative;
+
+  /* Apple Ethereal Liquid Ambient Mesh Background */
+  background-image: 
+    radial-gradient(at 10% 12%, rgba(200, 228, 255, 0.45) 0, transparent 45%),
+    radial-gradient(at 88% 14%, rgba(235, 220, 255, 0.4) 0, transparent 42%),
+    radial-gradient(at 20% 82%, rgba(205, 245, 238, 0.35) 0, transparent 48%),
+    radial-gradient(at 82% 84%, rgba(255, 230, 218, 0.4) 0, transparent 45%),
+    radial-gradient(at 50% 48%, rgba(255, 255, 255, 0.7) 0, transparent 55%);
+  background-size: 100% 100%;
+  background-attachment: fixed;
+  background-position: center;
 }
 
 /* ==========================================================================
-   Apple Liquid Glass Design System (Pure White Frosted & Translucent)
+   1. Ambient Liquid Glow Background (Smooth Apple Orbs)
    ========================================================================== */
-
-/* Primary Liquid Glass Container */
-.liquid-glass {
-  background: rgba(255, 255, 255, 0.74);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.88);
-  border-top: 1.5px solid rgba(255, 255, 255, 0.98);
-  box-shadow: 
-    0 12px 35px -5px rgba(15, 23, 42, 0.04),
-    0 4px 12px -2px rgba(15, 23, 42, 0.02),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
-    inset 0 0 18px 0 rgba(255, 255, 255, 0.25);
+.liquid-ambient-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
 }
 
-/* Secondary Liquid Glass Card */
-.liquid-glass-card {
-  background: rgba(255, 255, 255, 0.68);
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.84);
-  border-top: 1.2px solid rgba(255, 255, 255, 0.96);
-  box-shadow: 
-    0 8px 24px -4px rgba(15, 23, 42, 0.03),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.98);
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.28;
+  will-change: transform;
+  animation: orbFloat 24s ease-in-out infinite alternate;
 }
 
-/* Frosted Glass Subtle Pill & Capsule */
-.liquid-glass-subtle {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(18px) saturate(170%);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+.orb-primary {
+  width: 650px;
+  height: 650px;
+  top: -140px;
+  left: 15%;
+  background: radial-gradient(circle, #bae6fd 0%, #38bdf8 65%, transparent 100%);
 }
 
-/* Frosted Inset Well (Deep recessed glass) */
-.liquid-glass-inset {
-  background: rgba(248, 250, 252, 0.65);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(226, 232, 240, 0.7);
-  box-shadow: inset 0 2px 4px 0 rgba(15, 23, 42, 0.02);
+.orb-cyan {
+  width: 520px;
+  height: 520px;
+  bottom: 12%;
+  left: -100px;
+  background: radial-gradient(circle, #a7f3d0 0%, #34d399 65%, transparent 100%);
+  animation-duration: 28s;
+  animation-delay: -5s;
 }
 
-/* Backward compatibility for glass-panel */
+.orb-purple {
+  width: 580px;
+  height: 580px;
+  top: 25%;
+  right: -100px;
+  background: radial-gradient(circle, #e9d5ff 0%, #c084fc 65%, transparent 100%);
+  animation-duration: 32s;
+  animation-delay: -10s;
+}
+
+.orb-amber {
+  width: 480px;
+  height: 480px;
+  bottom: -80px;
+  right: 18%;
+  background: radial-gradient(circle, #fed7aa 0%, #fb923c 65%, transparent 100%);
+  animation-duration: 22s;
+  animation-delay: -14s;
+}
+
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 45px) scale(1.06); }
+  100% { transform: translate(-25px, -30px) scale(0.96); }
+}
+
+/* ==========================================================================
+   2. Apple Liquid Glass Containers & Cards
+   ========================================================================== */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(26px) saturate(190%);
-  -webkit-backdrop-filter: blur(26px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-top: 1.5px solid rgba(255, 255, 255, 1);
-  box-shadow: 
-    0 10px 30px -5px rgba(15, 23, 42, 0.04),
-    0 4px 8px -2px rgba(15, 23, 42, 0.02),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-specular);
+  border-radius: 20px;
+  position: relative;
+  transition: background var(--transition-normal), box-shadow var(--transition-normal), transform var(--transition-normal), border-color var(--transition-normal);
 }
 
 .glass-panel-hover {
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all var(--transition-normal);
 }
+
 .glass-panel-hover:hover {
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--glass-bg-hover);
   border-color: rgba(255, 255, 255, 1);
-  box-shadow: 
-    0 16px 40px -8px rgba(15, 23, 42, 0.06),
-    0 0 25px -4px rgba(175, 82, 222, 0.12),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1);
+  box-shadow: var(--glass-shadow-hover);
   transform: translateY(-2px);
 }
 
-/* ==========================================================================
-   Apple Intelligence Chromatic Aurora & Iridescent Accents
-   ========================================================================== */
-
-/* Signature Apple Intelligence Iridescent Gradient Text */
-.apple-intelligence-text {
-  background: linear-gradient(135deg, #007aff 0%, #5856d6 25%, #af52de 50%, #ff2d55 80%, #ff9f0a 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.liquid-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-specular);
 }
 
-/* Apple Intelligence Luminous Multi-Color Aura Glow */
-.apple-intelligence-glow {
-  box-shadow: 
-    0 0 35px -5px rgba(175, 82, 222, 0.24),
-    0 0 25px -4px rgba(0, 199, 190, 0.2),
-    0 0 20px -3px rgba(255, 45, 85, 0.16);
+.liquid-glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.03), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
 }
 
-/* Apple Intelligence Active Card Iridescent Rim */
-.apple-intelligence-border {
-  position: relative;
-}
-.apple-intelligence-border::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: linear-gradient(135deg, #00c7be, #007aff, #af52de, #ff2d55, #ff9f0a);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0.85;
-}
-
-/* Apple Intelligence Glowing Badge */
-.apple-intelligence-badge {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.08) 0%, rgba(175, 82, 222, 0.12) 50%, rgba(255, 45, 85, 0.08) 100%);
-  border: 1px solid rgba(175, 82, 222, 0.35);
-  box-shadow: 0 0 16px -2px rgba(175, 82, 222, 0.2);
-}
-
-/* Apple Liquid Specular Light Sheen */
-.liquid-specular {
-  position: relative;
-  overflow: hidden;
-}
-.liquid-specular::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 45%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.0) 100%);
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-/* ==========================================================================
-   Apple Intelligence Multi-Spectral Ambient Light Mesh Animations
-   ========================================================================== */
-@keyframes aurora-float-1 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  50% { transform: translate(35px, 25px) scale(1.08) rotate(6deg); }
-}
-
-@keyframes aurora-float-2 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  50% { transform: translate(-30px, -35px) scale(1.12) rotate(-8deg); }
-}
-
-@keyframes aurora-float-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(25px, -20px) scale(1.06); }
-}
-
-@keyframes apple-spin-slow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.animate-aurora-1 {
-  animation: aurora-float-1 20s ease-in-out infinite;
-}
-
-.animate-aurora-2 {
-  animation: aurora-float-2 24s ease-in-out infinite;
-}
-
-.animate-aurora-3 {
-  animation: aurora-float-3 22s ease-in-out infinite;
-}
-
-.animate-spin-slow {
-  animation: apple-spin-slow 12s linear infinite;
-}
-
-/* Apple Clean Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(203, 213, 225, 0.8);
+/* Backward compatibility */
+.glass-pill {
+  background: var(--glass-bg-pill);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.9);
   border-radius: 9999px;
+  transition: all var(--transition-fast);
 }
+
+/* ==========================================================================
+   3. Apple White Liquid Glass Buttons & Controls
+   ========================================================================== */
+.glass-button {
+  background: var(--glass-bg-pill);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-main);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.95);
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  cursor: pointer;
+}
+
+.glass-button:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06), inset 0 1px 1px #fff;
+  transform: translateY(-1px);
+}
+
+.glass-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.glass-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary Apple Blue Action Button */
+.btn-apple-primary {
+  background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  padding: 0.5rem 1.15rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 16px rgba(0, 113, 227, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.btn-apple-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 113, 227, 0.38), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  background: linear-gradient(135deg, #0077ed 0%, #0062c4 100%);
+}
+
+.btn-apple-primary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-apple-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   4. Segmented Controls & Indicator Chips
+   ========================================================================== */
+.segmented-track {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 3px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.segmented-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  padding: 5px 12px;
+  border-radius: 9px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.segmented-btn:hover:not(:disabled) {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.segmented-btn.selected {
+  background: #ffffff;
+  color: var(--apple-blue);
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07), inset 0 1px 1px #fff;
+}
+
+/* Technical Indicator Chips (from Chart Trainer) */
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.chip-btn:hover {
+  background: #ffffff;
+  color: var(--text-main);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.chip-btn.active {
+  background: #ffffff;
+  color: var(--apple-blue);
+  border-color: rgba(0, 113, 227, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 113, 227, 0.12);
+}
+
+.chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   5. Custom Refined Apple Scrollbar
+   ========================================================================== */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.9);
+  background: rgba(0, 0, 0, 0.3);
 }

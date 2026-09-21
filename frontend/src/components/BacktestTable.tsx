@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { History, CheckCircle2, XCircle, Award, Target, TrendingUp, TrendingDown } from 'lucide-react';
+import { History, CheckCircle2, XCircle, Award, Target, TrendingUp, TrendingDown, Layers } from 'lucide-react';
 import { BacktestSummaryResponse } from '../types';
 import { api } from '../services/api';
 
@@ -32,81 +32,79 @@ export const BacktestTable: React.FC<BacktestTableProps> = ({ assetKey, refreshK
   }, [assetKey, days, refreshKey]);
 
   return (
-    <div className="liquid-glass rounded-3xl p-5 sm:p-6 space-y-5 shadow-glass-specular border border-white/90">
+    <div className="glass-panel !rounded-3xl p-5 sm:p-6 space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-black/[0.05]">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100/80 shadow-2xs">
+          <div className="w-7 h-7 rounded-lg bg-black/[0.04] text-[#0071e3] flex items-center justify-center border border-black/[0.04]">
             <History className="w-4 h-4" />
           </div>
-          <h2 className="text-base font-black text-slate-900 tracking-tight">과거 예측 vs 실제 시장 결과 백테스트</h2>
-          <span className="text-xs text-slate-400 font-semibold">({data?.asset_name})</span>
+          <div>
+            <h2 className="text-base font-bold text-[#1d1d1f] tracking-tight">과거 예측 vs 실제 시장 결과 백테스트</h2>
+          </div>
+          <span className="text-xs text-[#86868b] font-semibold">({data?.asset_name})</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Days Filter */}
-          <div className="flex bg-slate-200/40 p-0.5 rounded-xl border border-white/80 text-xs shadow-inner backdrop-blur-md">
-            {[10, 20, 30, 60].map((d) => (
-              <button
-                key={d}
-                onClick={() => setDays(d)}
-                className={`px-3 py-1 rounded-lg transition font-bold ${
-                  days === d ? 'bg-white/95 text-slate-900 shadow-sm border border-white/90' : 'text-slate-500 hover:text-slate-900'
-                }`}
-              >
-                최근 {d}일
-              </button>
-            ))}
-          </div>
+        {/* Days Filter Segmented Track */}
+        <div className="segmented-track">
+          {[10, 20, 30, 60].map((d) => (
+            <button
+              key={d}
+              onClick={() => setDays(d)}
+              className={`segmented-btn !py-1 !px-2.5 text-xs ${days === d ? 'selected' : ''}`}
+            >
+              최근 {d}일
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Summary Stat Cards */}
       {data && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-          <div className="liquid-glass-card p-4 rounded-3xl border border-white/90 shadow-sm flex items-center gap-3.5 backdrop-blur-xl">
-            <div className="p-2.5 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100/80 shadow-2xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="liquid-glass-card p-3.5 rounded-2xl flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#0071e3]/[0.08] text-[#0071e3] flex items-center justify-center flex-shrink-0">
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] font-bold text-slate-400">방향 적중률 (Hit Ratio)</div>
-              <div className="text-xl font-black text-slate-900 mt-0.5">
-                {data.hit_ratio_pct}% <span className="text-xs font-normal text-slate-400">({data.hit_count}/{data.total_days})</span>
+              <div className="text-[11px] font-semibold text-[#86868b]">방향 적중률 (Hit Ratio)</div>
+              <div className="text-lg font-bold text-[#1d1d1f]">
+                {data.hit_ratio_pct}% <span className="text-xs font-normal text-[#86868b]">({data.hit_count}/{data.total_days})</span>
               </div>
             </div>
           </div>
 
-          <div className="liquid-glass-card p-4 rounded-3xl border border-white/90 shadow-sm flex items-center gap-3.5 backdrop-blur-xl">
-            <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100/80 shadow-2xs">
+          <div className="liquid-glass-card p-3.5 rounded-2xl flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#059669]/[0.08] text-[#059669] flex items-center justify-center flex-shrink-0">
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] font-bold text-slate-400">Out-of-Sample 정확도</div>
-              <div className="text-xl font-black text-emerald-700 mt-0.5">
+              <div className="text-[11px] font-semibold text-[#86868b]">Out-of-Sample 정확도</div>
+              <div className="text-lg font-bold text-[#059669]">
                 {(data.out_of_sample_acc * 100).toFixed(1)}%
               </div>
             </div>
           </div>
 
-          <div className="liquid-glass-card p-4 rounded-3xl border border-white/90 shadow-sm flex items-center gap-3.5 backdrop-blur-xl">
-            <div className="p-2.5 rounded-2xl bg-cyan-50 text-cyan-600 border border-cyan-100/80 shadow-2xs">
+          <div className="liquid-glass-card p-3.5 rounded-2xl flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#0284c7]/[0.08] text-[#0284c7] flex items-center justify-center flex-shrink-0">
               <History className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] font-bold text-slate-400">Macro F1 Score</div>
-              <div className="text-xl font-black text-cyan-700 mt-0.5">
+              <div className="text-[11px] font-semibold text-[#86868b]">Macro F1 Score</div>
+              <div className="text-lg font-bold text-[#0284c7]">
                 {data.out_of_sample_f1.toFixed(3)}
               </div>
             </div>
           </div>
 
-          <div className="liquid-glass-card p-4 rounded-3xl border border-white/90 shadow-sm flex items-center gap-3.5 backdrop-blur-xl">
-            <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-purple-50 to-indigo-50 text-purple-600 border border-purple-100/80 shadow-2xs">
-              <CheckCircle2 className="w-5 h-5" />
+          <div className="liquid-glass-card p-3.5 rounded-2xl flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#9333ea]/[0.08] text-[#9333ea] flex items-center justify-center flex-shrink-0">
+              <Layers className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] font-bold text-slate-400">마스터 시그널 기준</div>
-              <div className="text-xs font-black text-slate-800 mt-1">
+              <div className="text-[11px] font-semibold text-[#86868b]">마스터 기준</div>
+              <div className="text-sm font-bold text-[#1d1d1f] mt-0.5">
                 앙상블 Soft Voting
               </div>
             </div>
@@ -116,72 +114,74 @@ export const BacktestTable: React.FC<BacktestTableProps> = ({ assetKey, refreshK
 
       {/* Table View */}
       {loading ? (
-        <div className="h-48 flex items-center justify-center text-sm text-slate-400">
-          <div className="flex items-center gap-2.5">
-            <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-            <span className="font-bold text-slate-600">백테스트 히스토리 로드 중...</span>
+        <div className="h-44 flex items-center justify-center text-xs text-[#86868b]">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
+            <span className="font-semibold text-[#515154]">백테스트 히스토리 로드 중...</span>
           </div>
         </div>
       ) : !data || data.history.length === 0 ? (
-        <div className="h-48 flex items-center justify-center text-sm text-slate-400">
+        <div className="h-44 flex items-center justify-center text-xs text-[#86868b]">
           백테스트 데이터가 없습니다.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-3xl border border-white/90 bg-white/70 backdrop-blur-xl shadow-sm">
-          <table className="w-full text-left text-xs text-slate-700">
-            <thead className="bg-slate-100/70 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-200/60 font-black">
+        <div className="overflow-x-auto rounded-2xl border border-black/[0.06] bg-white/70">
+          <table className="w-full text-left text-xs text-[#1d1d1f]">
+            <thead className="bg-black/[0.03] text-[#86868b] uppercase text-[10px] tracking-wider border-b border-black/[0.05] font-bold">
               <tr>
-                <th className="py-3.5 px-4">기준 거래일</th>
-                <th className="py-3.5 px-4">예측 목표일</th>
-                <th className="py-3.5 px-4">XGBoost (확률)</th>
-                <th className="py-3.5 px-4">Random Forest</th>
-                <th className="py-3.5 px-4 text-purple-700 font-black">Ensemble (마스터)</th>
-                <th className="py-3.5 px-4 text-right">실제 수익률</th>
-                <th className="py-3.5 px-4 text-center">실제 결과</th>
-                <th className="py-3.5 px-4 text-center">적중 여부</th>
+                <th className="py-3 px-3.5">기준 거래일</th>
+                <th className="py-3 px-3.5">예측 목표일</th>
+                <th className="py-3 px-3.5">XGBoost (확률)</th>
+                <th className="py-3 px-3.5">Random Forest</th>
+                <th className="py-3 px-3.5 text-[#0071e3] font-bold">Ensemble (마스터)</th>
+                <th className="py-3 px-3.5 text-right">실제 수익률</th>
+                <th className="py-3 px-3.5 text-center">실제 결과</th>
+                <th className="py-3 px-3.5 text-center">적중 여부</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-mono">
+            <tbody className="divide-y divide-black/[0.04] font-mono">
               {data.history.map((row, idx) => {
                 const isUpActual = row.actual_return_pct > 0;
                 return (
-                  <tr key={idx} className="hover:bg-white/90 transition-colors">
-                    <td className="py-3 px-4 text-slate-400">{row.base_date}</td>
-                    <td className="py-3 px-4 text-slate-900 font-bold">{row.target_date}</td>
-                    <td className="py-3 px-4 font-medium">
-                      <span className={row.xgb_prob >= 0.5 ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}>
+                  <tr key={idx} className="hover:bg-black/[0.02] transition-colors">
+                    <td className="py-2.5 px-3.5 text-[#86868b]">{row.base_date}</td>
+                    <td className="py-2.5 px-3.5 text-[#1d1d1f] font-semibold">{row.target_date}</td>
+                    <td className="py-2.5 px-3.5 font-medium">
+                      <span className={row.xgb_prob >= 0.5 ? 'text-[#e02424] font-semibold' : 'text-[#059669] font-semibold'}>
                         {row.xgb_label} ({(row.xgb_prob * 100).toFixed(1)}%)
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-medium">
-                      <span className={row.rf_prob >= 0.5 ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}>
+                    <td className="py-2.5 px-3.5 font-medium">
+                      <span className={row.rf_prob >= 0.5 ? 'text-[#e02424] font-semibold' : 'text-[#059669] font-semibold'}>
                         {row.rf_label} ({(row.rf_prob * 100).toFixed(1)}%)
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-black text-purple-700">
+                    <td className="py-2.5 px-3.5 font-bold text-[#0071e3]">
                       {row.ensemble_label} ({(row.ensemble_prob * 100).toFixed(1)}%)
                     </td>
-                    <td className={`py-3 px-4 text-right font-black ${
-                      isUpActual ? 'text-emerald-700' : 'text-rose-700'
+                    <td className={`py-2.5 px-3.5 text-right font-bold ${
+                      isUpActual ? 'text-[#e02424]' : 'text-[#059669]'
                     }`}>
                       {isUpActual ? '+' : ''}{row.actual_return_pct.toFixed(2)}%
                     </td>
-                    <td className="py-3 px-4 text-center">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-sans font-bold border shadow-2xs ${
-                        isUpActual ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80' : 'bg-rose-50 text-rose-700 border-rose-200/80'
+                    <td className="py-2.5 px-3.5 text-center font-sans">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${
+                        isUpActual 
+                          ? 'bg-[#e02424]/[0.08] text-[#e02424] border-[#e02424]/20' 
+                          : 'bg-[#059669]/[0.08] text-[#059669] border-[#059669]/20'
                       }`}>
                         {isUpActual ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                         {row.actual_direction}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-center font-sans">
+                    <td className="py-2.5 px-3.5 text-center font-sans">
                       {row.is_hit ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-black shadow-2xs">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 적중
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#059669]/[0.08] text-[#059669] border border-[#059669]/20 text-xs font-bold">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> 적중
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200/80 text-xs font-black shadow-2xs">
-                          <XCircle className="w-3.5 h-3.5 text-rose-600" /> 불일치
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#e02424]/[0.08] text-[#e02424] border border-[#e02424]/20 text-xs font-bold">
+                          <XCircle className="w-3.5 h-3.5" /> 불일치
                         </span>
                       )}
                     </td>
@@ -195,3 +195,5 @@ export const BacktestTable: React.FC<BacktestTableProps> = ({ assetKey, refreshK
     </div>
   );
 };
+
+export default BacktestTable;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
-import { BarChart3, HelpCircle, Layers } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { FeatureImportanceItem } from '../types';
 import { api } from '../services/api';
 
@@ -9,10 +9,11 @@ interface FeatureImportanceProps {
   refreshKey?: number;
 }
 
+// Apple Cool Cohesive Fintech Palette
 const BAR_COLORS = [
-  '#00c7be', '#007aff', '#5856d6', '#8b5cf6', '#af52de',
-  '#d946ef', '#ff2d55', '#ff9f0a', '#10b981', '#06b6d4',
-  '#3b82f6', '#6366f1', '#ec4899', '#14b8a6', '#64748b'
+  '#0071e3', '#0077ed', '#0284c7', '#0ea5e9', '#38bdf8',
+  '#2563eb', '#3b82f6', '#4f46e5', '#6366f1', '#818cf8',
+  '#06b6d4', '#0891b2', '#0d9488', '#14b8a6', '#64748b'
 ];
 
 export const FeatureImportance: React.FC<FeatureImportanceProps> = ({ assetKey, refreshKey }) => {
@@ -43,28 +44,26 @@ export const FeatureImportance: React.FC<FeatureImportanceProps> = ({ assetKey, 
   const chartData = [...features].reverse();
 
   return (
-    <div className="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 shadow-glass-specular border border-white/90">
+    <div className="glass-panel !rounded-3xl p-5 sm:p-6 space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-black/[0.05]">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-100/80 shadow-2xs">
+          <div className="w-7 h-7 rounded-lg bg-black/[0.04] text-[#0071e3] flex items-center justify-center border border-black/[0.04]">
             <BarChart3 className="w-4 h-4" />
           </div>
-          <h2 className="text-base font-black text-slate-900 tracking-tight">AI 핵심 피처 중요도 분석</h2>
-          <span className="text-xs text-slate-400 font-semibold">(상위 15개 요인)</span>
+          <div>
+            <h2 className="text-base font-bold text-[#1d1d1f] tracking-tight">AI 핵심 피처 중요도</h2>
+          </div>
+          <span className="text-xs text-[#86868b] font-semibold">(TOP 15)</span>
         </div>
 
-        {/* Model Selector Tabs */}
-        <div className="flex bg-slate-200/40 p-0.5 rounded-xl border border-white/80 text-xs shadow-inner backdrop-blur-md">
+        {/* Model Selector Segmented Tabs */}
+        <div className="segmented-track">
           {['XGB', 'RF', 'LGBM'].map((model) => (
             <button
               key={model}
               onClick={() => setSelectedModel(model)}
-              className={`px-3 py-1 rounded-lg transition font-bold ${
-                selectedModel === model
-                  ? 'bg-white/95 text-slate-900 shadow-sm border border-white/90'
-                  : 'text-slate-500 hover:text-slate-900'
-              }`}
+              className={`segmented-btn !py-1 !px-2.5 text-xs ${selectedModel === model ? 'selected' : ''}`}
             >
               {model === 'XGB' ? 'XGBoost' : (model === 'RF' ? 'Random Forest' : 'LightGBM')}
             </button>
@@ -73,15 +72,15 @@ export const FeatureImportance: React.FC<FeatureImportanceProps> = ({ assetKey, 
       </div>
 
       {loading ? (
-        <div className="h-64 flex items-center justify-center text-sm text-slate-400">
-          <div className="flex items-center gap-2.5">
-            <div className="w-4 h-4 border-2 border-cyan-600 border-t-transparent rounded-full animate-spin" />
-            <span className="font-bold text-slate-600">피처 중요도 산출 중...</span>
+        <div className="h-64 flex items-center justify-center text-xs text-[#86868b]">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
+            <span className="font-semibold text-[#515154]">피처 중요도 산출 중...</span>
           </div>
         </div>
       ) : features.length === 0 ? (
-        <div className="h-64 flex items-center justify-center text-sm text-slate-400">
-          피처 중요도 데이터를 불러올 수 없습니다.
+        <div className="h-64 flex items-center justify-center text-xs text-[#86868b]">
+          피처 중요도 데이터가 없습니다.
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
@@ -91,33 +90,38 @@ export const FeatureImportance: React.FC<FeatureImportanceProps> = ({ assetKey, 
               <BarChart
                 data={chartData}
                 layout="vertical"
-                margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                margin={{ top: 5, right: 25, left: 35, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                <XAxis type="number" stroke="#94a3b8" tick={{ fontSize: 10, fill: '#64748b' }} tickFormatter={(v) => `${(v * 100).toFixed(0)}%`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#eef2f6" horizontal={false} />
+                <XAxis
+                  type="number"
+                  stroke="#94a3b8"
+                  tick={{ fontSize: 10, fill: '#86868b' }}
+                  tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
+                />
                 <YAxis
                   type="category"
                   dataKey="feature"
                   stroke="#94a3b8"
-                  tick={{ fontSize: 11, fill: '#334155', fontWeight: 700 }}
-                  width={90}
+                  tick={{ fontSize: 11, fill: '#1d1d1f', fontWeight: 600 }}
+                  width={85}
                 />
                 <Tooltip
-                  formatter={(value: any, name: any, props: any) => [
+                  formatter={(value: any, _, props: any) => [
                     `${(Number(value) * 100).toFixed(2)}%`,
                     props.payload.description || '중요도'
                   ]}
                   contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.94)',
                     backdropFilter: 'blur(20px)',
-                    borderColor: 'rgba(255, 255, 255, 0.95)',
-                    borderRadius: '1rem',
-                    fontSize: '12px',
-                    boxShadow: '0 12px 30px -4px rgba(15, 23, 42, 0.08)',
-                    color: '#0f172a'
+                    borderColor: 'rgba(0, 0, 0, 0.08)',
+                    borderRadius: '0.75rem',
+                    fontSize: '11px',
+                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
+                    color: '#1d1d1f'
                   }}
                 />
-                <Bar dataKey="importance" radius={[0, 6, 6, 0]}>
+                <Bar dataKey="importance" radius={[0, 4, 4, 0]}>
                   {chartData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
                   ))}
@@ -127,23 +131,23 @@ export const FeatureImportance: React.FC<FeatureImportanceProps> = ({ assetKey, 
           </div>
 
           {/* Top 5 Highlight List */}
-          <div className="lg:col-span-4 bg-white/70 p-4 rounded-3xl border border-white/90 shadow-sm space-y-3 backdrop-blur-xl">
-            <span className="text-xs font-black text-slate-400 uppercase tracking-wider block">
-              가장 영향력이 큰 TOP 5 요인
+          <div className="lg:col-span-4 p-3.5 rounded-2xl bg-white/60 border border-black/[0.05] shadow-xs space-y-2.5">
+            <span className="text-[11px] font-bold text-[#86868b] uppercase tracking-wider block">
+              가장 영향력이 큰 TOP 5
             </span>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {features.slice(0, 5).map((item, idx) => (
-                <div key={item.feature} className="flex items-start justify-between text-xs bg-white/85 p-2.5 rounded-2xl border border-white/90 shadow-2xs">
+                <div key={item.feature} className="flex items-start justify-between text-xs bg-white/80 p-2 rounded-xl border border-black/[0.04]">
                   <div className="space-y-0.5">
-                    <div className="flex items-center gap-2 font-black text-slate-900">
-                      <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-400 to-indigo-500 text-white flex items-center justify-center text-[10px] font-black shadow-2xs">
+                    <div className="flex items-center gap-1.5 font-bold text-[#1d1d1f]">
+                      <span className="w-4 h-4 rounded-full bg-[#0071e3] text-white flex items-center justify-center text-[10px] font-bold">
                         {idx + 1}
                       </span>
                       <span>{item.feature}</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 pl-7 line-clamp-1 font-medium">{item.description}</p>
+                    <p className="text-[10px] text-[#86868b] pl-5 line-clamp-1">{item.description}</p>
                   </div>
-                  <span className="font-mono font-black text-indigo-700 text-xs">
+                  <span className="font-mono font-bold text-[#0071e3] text-xs self-center">
                     {(item.importance * 100).toFixed(1)}%
                   </span>
                 </div>
@@ -155,3 +159,5 @@ export const FeatureImportance: React.FC<FeatureImportanceProps> = ({ assetKey, 
     </div>
   );
 };
+
+export default FeatureImportance;
