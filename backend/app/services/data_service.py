@@ -23,42 +23,43 @@ class DataService:
             asset_name = preset_info["name"]
             ticker = preset_info["ticker"]
             csv_path = AppConfig.get_csv_for_preset(identifier)
-            
-            if csv_path and os.path.exists(csv_path) and not force_download:
-                df = DataService._load_local_csv(csv_path)
-                return df, asset_name, ticker
         else:
-            # 커스텀 티커로 처리
             ticker = identifier.strip().upper()
             asset_name = ticker
+            csv_path = None
 
-        # 2. 캐시 확인
         cache_file = CACHE_DIR / f"{ticker.replace('^', 'INDEX_').replace('.', '_')}_daily.csv"
-        if cache_file.exists() and not force_download:
-            # 캐시가 오늘 다운로드된 것이면 바로 사용
-            mod_time = datetime.fromtimestamp(os.path.getmtime(cache_file))
-            if mod_time.date() == datetime.now().date():
-                df = DataService._load_local_csv(str(cache_file))
+
+        # 2. 캐시 확인 (강제 다운로드가 아닐 때 최신 캐시 우선 로드)
+        if not force_download and cache_file.exists():
+            df = DataService._load_local_csv(str(cache_file))
+            if df is not None and len(df) >= 100:
                 return df, asset_name, ticker
 
-        # 3. Yahoo Finance에서 다운로드
-        df = DataService._download_from_yfinance(ticker)
-        if df is not None and not df.empty:
-            # 캐시 저장
-            df.to_csv(cache_file, index=False)
+        # 3. 로컬 시드 CSV 확인 (캐시가 없고 강제 다운로드가 아닐 때)
+        if not force_download and csv_path and os.path.exists(csv_path):
+            df = DataService._load_local_csv(csv_path)
             return df, asset_name, ticker
 
-        # 다운로드 실패 시 캐시 파일이 있으면 그거라도 반환
+        # 4. Yahoo Finance에서 최신 데이터 다운로드 (force_download 이거나 캐시가 없을 때)
+        try:
+            df = DataService._download_from_yfinance(ticker)
+            if df is not None and not df.empty and len(df) >= 50:
+                # 최신 캐시 저장
+                df.to_csv(cache_file, index=False)
+                return df, asset_name, ticker
+        except Exception as err:
+            print(f"yfinance download failed for {ticker}: {err}")
+
+        # 다운로드 실패 시 캐시 파일 fallback
         if cache_file.exists():
             df = DataService._load_local_csv(str(cache_file))
             return df, asset_name, ticker
 
-        # 프리셋 로컬 파일이 있으면 fallback
-        if preset_info:
-            csv_path = AppConfig.get_csv_for_preset(identifier)
-            if csv_path and os.path.exists(csv_path):
-                df = DataService._load_local_csv(csv_path)
-                return df, asset_name, ticker
+        # 로컬 시드 파일 fallback
+        if csv_path and os.path.exists(csv_path):
+            df = DataService._load_local_csv(csv_path)
+            return df, asset_name, ticker
 
         raise ValueError(f"데이터를 가져올 수 없습니다: {identifier} ({ticker})")
 

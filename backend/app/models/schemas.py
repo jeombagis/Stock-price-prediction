@@ -26,6 +26,7 @@ class PredictionOverviewResponse(BaseModel):
     ticker: str
     base_date: str
     target_date: str
+    total_records: Optional[int] = Field(None, description="분석에 사용된 총 일별 시계열 데이터 수")
     latest_close: float
     prev_close: float
     daily_change_pct: float
@@ -99,6 +100,7 @@ class RetrainRequest(BaseModel):
     threshold: float = Field(0.002, ge=0.0, le=0.05)
     train_split: float = Field(0.8, ge=0.5, le=0.95)
     fast_mode: bool = Field(True, description="빠른 반응성을 위해 간소화된 CV 파라미터 적용 여부")
+    force_sync: bool = Field(False, description="실시간 최신 시장 데이터 강제 다운로드 포함 여부")
 
 class RetrainResponse(BaseModel):
     success: bool

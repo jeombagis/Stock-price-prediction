@@ -15,22 +15,36 @@ from app.services.backtest_service import BacktestService
 
 router = APIRouter(prefix="/api", tags=["Stock Prediction"])
 
-# 메모리 파이프라인 캐시
+# 메모리 파이프라인 캐시 및 활성 파라미터 상태
 _pipeline_cache: Dict[str, Dict[str, Any]] = {}
+_active_params: Dict[str, Dict[str, Any]] = {}
 
 def _run_pipeline(
     identifier: str,
-    window_size: int = AppConfig.WINDOW_SIZE,
-    threshold: float = AppConfig.THRESHOLD,
-    train_split: float = AppConfig.TRAIN_SPLIT,
-    fast_mode: bool = True,
+    window_size: Optional[int] = None,
+    threshold: Optional[float] = None,
+    train_split: Optional[float] = None,
+    fast_mode: Optional[bool] = None,
     force_download: bool = False
 ) -> Dict[str, Any]:
     """
     데이터 로드, 피처 엔지니어링, 모델 학습 파이프라인 일괄 실행 및 캐싱
     """
-    cache_key = f"{identifier}_{window_size}_{threshold}_{train_split}_{fast_mode}"
-    if not force_download and cache_key in _pipeline_cache:
+    # 활성 파라미터가 등록되어 있다면 우선 적용
+    curr_active = _active_params.get(identifier, {})
+    eff_window = window_size if window_size is not None else curr_active.get('window_size', AppConfig.WINDOW_SIZE)
+    eff_thresh = threshold if threshold is not None else curr_active.get('threshold', AppConfig.THRESHOLD)
+    eff_split = train_split if train_split is not None else curr_active.get('train_split', AppConfig.TRAIN_SPLIT)
+    eff_fast = fast_mode if fast_mode is not None else curr_active.get('fast_mode', True)
+
+    cache_key = f"{identifier}_{eff_window}_{eff_thresh}_{eff_split}_{eff_fast}"
+
+    if force_download:
+        # 강제 최신 데이터 갱신 시 해당 자산의 기존 파이프라인 캐시 일괄 무효화
+        keys_to_clear = [k for k in _pipeline_cache if k.startswith(f"{identifier}_")]
+        for k in keys_to_clear:
+            _pipeline_cache.pop(k, None)
+    elif cache_key in _pipeline_cache:
         return _pipeline_cache[cache_key]
 
     try:
@@ -41,15 +55,15 @@ def _run_pipeline(
     if len(raw_df) < 100:
         raise HTTPException(status_code=400, detail=f"학습에 필요한 데이터 수가 부족합니다 (현재 {len(raw_df)}개, 최소 100개 필요)")
 
-    feature_engine = FeatureEngine(window_size=window_size, threshold=threshold)
+    feature_engine = FeatureEngine(window_size=eff_window, threshold=eff_thresh)
     processed_df = feature_engine.compute_technical_indicators(raw_df)
 
     if len(processed_df) < 50:
         raise HTTPException(status_code=400, detail="보조지표 계산 후 유효 데이터 수가 부족합니다.")
 
-    X_train, X_test, y_train, y_test, df_test = feature_engine.split_and_scale(processed_df, train_split=train_split)
+    X_train, X_test, y_train, y_test, df_test = feature_engine.split_and_scale(processed_df, train_split=eff_split)
 
-    model_engine = ModelEngine(fast_mode=fast_mode)
+    model_engine = ModelEngine(fast_mode=eff_fast)
     model_engine.train_models(X_train, y_train, X_test, y_test)
 
     # 최신 데이터로 익일 예측
@@ -67,6 +81,7 @@ def _run_pipeline(
         ticker=ticker,
         base_date=pred_res['base_date'],
         target_date=pred_res['target_date'],
+        total_records=len(raw_df),
         latest_close=round(latest_close, 2),
         prev_close=round(prev_close, 2),
         daily_change_pct=daily_change_pct,
@@ -77,10 +92,10 @@ def _run_pipeline(
         ai_opinion=pred_res['ai_opinion'],
         models=pred_res['models'],
         parameters={
-            'window_size': window_size,
-            'threshold': threshold,
-            'train_split': train_split,
-            'fast_mode': fast_mode
+            'window_size': eff_window,
+            'threshold': eff_thresh,
+            'train_split': eff_split,
+            'fast_mode': eff_fast
         }
     )
 
@@ -231,17 +246,29 @@ def retrain_model(req: RetrainRequest):
     """
     사용자 정의 파라미터(Window Size, Threshold, Train Split)를 적용하여 실시간 재학습
     """
+    # 활성 파라미터 상태 저장
+    _active_params[req.asset_key_or_ticker] = {
+        'window_size': req.window_size,
+        'threshold': req.threshold,
+        'train_split': req.train_split,
+        'fast_mode': req.fast_mode
+    }
+
     pipeline = _run_pipeline(
         identifier=req.asset_key_or_ticker,
         window_size=req.window_size,
         threshold=req.threshold,
         train_split=req.train_split,
         fast_mode=req.fast_mode,
-        force_download=False
+        force_download=req.force_sync
     )
+
+    msg = f"'{pipeline['asset_name']}' 모델 재학습이 성공적으로 완료되었습니다."
+    if req.force_sync:
+        msg = f"'{pipeline['asset_name']}' 최신 데이터 갱신 및 모델 재학습이 완료되었습니다. (총 {len(pipeline['raw_df']):,}건)"
 
     return RetrainResponse(
         success=True,
-        message=f"'{pipeline['asset_name']}' 모델 재학습이 성공적으로 완료되었습니다.",
+        message=msg,
         prediction=pipeline['prediction_response']
     )
