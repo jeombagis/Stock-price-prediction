@@ -7,11 +7,23 @@ interface LegalModalProps {
 }
 
 export const LegalModal: React.FC<LegalModalProps> = ({ isOpen, onClose }) => {
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/25 backdrop-blur-[24px] animate-in fade-in duration-200">
-      <div className="glass-panel !bg-white/95 !rounded-3xl w-full max-w-2xl max-h-[85vh] p-6 sm:p-7 shadow-glass-hover space-y-4 relative flex flex-col">
+      <div 
+        className="glass-panel !bg-white/95 !rounded-3xl w-full max-w-2xl max-h-[85vh] p-6 sm:p-7 shadow-glass-hover space-y-4 relative flex flex-col"
+        role="dialog"
+        aria-modal="true"
+      >
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-3 border-b border-black/[0.06] flex-shrink-0">
           <div className="flex items-center gap-2.5">

@@ -1,1 +1,160 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="46" fill="none" viewBox="0 0 48 46"><path fill="#863bff" d="M25.946 44.938c-.664.845-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.287c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.497 0-3.578-1.842-3.578H1.237c-.92 0-1.456-1.04-.92-1.788L10.013.474c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.579 1.842 3.579h11.377c.943 0 1.473 1.088.89 1.83L25.947 44.94z" style="fill:#863bff;fill:color(display-p3 .5252 .23 1);fill-opacity:1"/><mask id="a" width="48" height="46" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#000" d="M25.842 44.938c-.664.844-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.183c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.498 0-3.579-1.842-3.579H1.133c-.92 0-1.456-1.04-.92-1.787L9.91.473c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.578 1.842 3.578h11.377c.943 0 1.473 1.088.89 1.832L25.843 44.94z" style="fill:#000;fill-opacity:1"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="5.508" cy="14.704" fill="#ede6ff" rx="5.508" ry="14.704" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -4.47 31.516)"/></g><g filter="url(#c)"><ellipse cx="10.399" cy="29.851" fill="#ede6ff" rx="10.399" ry="29.851" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -39.328 7.883)"/></g><g filter="url(#d)"><ellipse cx="5.508" cy="30.487" fill="#7e14ff" rx="5.508" ry="30.487" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.814 -25.913 -14.639)scale(1 -1)"/></g><g filter="url(#e)"><ellipse cx="5.508" cy="30.599" fill="#7e14ff" rx="5.508" ry="30.599" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.814 -32.644 -3.334)scale(1 -1)"/></g><g filter="url(#f)"><ellipse cx="5.508" cy="30.599" fill="#7e14ff" rx="5.508" ry="30.599" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -34.34 30.47)"/></g><g filter="url(#g)"><ellipse cx="14.072" cy="22.078" fill="#ede6ff" rx="14.072" ry="22.078" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="rotate(93.35 24.506 48.493)scale(-1 1)"/></g><g filter="url(#h)"><ellipse cx="3.47" cy="21.501" fill="#7e14ff" rx="3.47" ry="21.501" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.009 28.708 47.59)scale(-1 1)"/></g><g filter="url(#i)"><ellipse cx="3.47" cy="21.501" fill="#7e14ff" rx="3.47" ry="21.501" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.009 28.708 47.59)scale(-1 1)"/></g><g filter="url(#j)"><ellipse cx=".387" cy="8.972" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(39.51 .387 8.972)"/></g><g filter="url(#k)"><ellipse cx="47.523" cy="-6.092" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 47.523 -6.092)"/></g><g filter="url(#l)"><ellipse cx="41.412" cy="6.333" fill="#47bfff" rx="5.971" ry="9.665" style="fill:#47bfff;fill:color(display-p3 .2799 .748 1);fill-opacity:1" transform="rotate(37.892 41.412 6.333)"/></g><g filter="url(#m)"><ellipse cx="-1.879" cy="38.332" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 -1.88 38.332)"/></g><g filter="url(#n)"><ellipse cx="-1.879" cy="38.332" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 -1.88 38.332)"/></g><g filter="url(#o)"><ellipse cx="35.651" cy="29.907" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 35.651 29.907)"/></g><g filter="url(#p)"><ellipse cx="38.418" cy="32.4" fill="#47bfff" rx="5.971" ry="15.297" style="fill:#47bfff;fill:color(display-p3 .2799 .748 1);fill-opacity:1" transform="rotate(37.892 38.418 32.4)"/></g></g><defs><filter id="b" width="60.045" height="41.654" x="-19.77" y="16.149" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="c" width="90.34" height="51.437" x="-54.613" y="-7.533" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="d" width="79.355" height="29.4" x="-49.64" y="2.03" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="e" width="79.579" height="29.4" x="-45.045" y="20.029" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="f" width="79.579" height="29.4" x="-43.513" y="21.178" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="g" width="74.749" height="58.852" x="15.756" y="-17.901" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="h" width="61.377" height="25.362" x="23.548" y="2.284" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="i" width="61.377" height="25.362" x="23.548" y="2.284" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="j" width="56.045" height="63.649" x="-27.636" y="-22.853" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="k" width="54.814" height="64.646" x="20.116" y="-38.415" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="l" width="33.541" height="35.313" x="24.641" y="-11.323" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="m" width="54.814" height="64.646" x="-29.286" y="6.009" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="n" width="54.814" height="64.646" x="-29.286" y="6.009" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="o" width="54.814" height="64.646" x="8.244" y="-2.416" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="p" width="39.409" height="43.623" x="18.713" y="10.588" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter></defs></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient: Apple Pro Deep Navy / Royal Blue -->
+    <linearGradient id="stockalgo-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0077ED" />
+      <stop offset="50%" stop-color="#0056C7" />
+      <stop offset="100%" stop-color="#002466" />
+    </linearGradient>
+
+    <!-- Glass Rim Highlight -->
+    <linearGradient id="stockalgo-rim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.7" />
+      <stop offset="30%" stop-color="#FFFFFF" stop-opacity="0.2" />
+      <stop offset="70%" stop-color="#38BDF8" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.3" />
+    </linearGradient>
+
+    <!-- Ambient Top-Left Specular Light -->
+    <radialGradient id="stockalgo-specular" cx="22%" cy="18%" r="65%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.45" />
+      <stop offset="55%" stop-color="#0077ED" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#0077ED" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Horizon Area Gradient with smooth decay -->
+    <linearGradient id="stockalgo-area" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.32" />
+      <stop offset="70%" stop-color="#0071E3" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#0071E3" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Mask to fade out area fill on the right -->
+    <linearGradient id="stockalgo-mask-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1" />
+      <stop offset="75%" stop-color="#FFFFFF" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </linearGradient>
+    <mask id="stockalgo-mask">
+      <rect width="512" height="512" fill="url(#stockalgo-mask-grad)" />
+    </mask>
+
+    <!-- Candlestick Bar Gradients -->
+    <linearGradient id="stockalgo-bar1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#BAE6FD" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.15" />
+    </linearGradient>
+
+    <linearGradient id="stockalgo-bar2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#BAE6FD" stop-opacity="0.82" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.22" />
+    </linearGradient>
+
+    <linearGradient id="stockalgo-bar3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E0F2FE" stop-opacity="0.92" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.28" />
+    </linearGradient>
+
+    <!-- AI Predicted Forward Candlestick -->
+    <linearGradient id="stockalgo-bar4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#67E8F9" stop-opacity="0.95" />
+      <stop offset="50%" stop-color="#38BDF8" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.15" />
+    </linearGradient>
+
+    <!-- Trajectory Stroke Gradient -->
+    <linearGradient id="stockalgo-traj" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#93C5FD" />
+      <stop offset="30%" stop-color="#FFFFFF" />
+      <stop offset="75%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+
+    <!-- Node Halo Gradient -->
+    <radialGradient id="stockalgo-node-halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="1" />
+      <stop offset="60%" stop-color="#0071E3" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#0071E3" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Glow Filters -->
+    <filter id="stockalgo-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="stockalgo-spark" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 1. Apple Squircle Base with Precision Rim -->
+  <rect width="512" height="512" rx="114" fill="url(#stockalgo-bg)" />
+  <rect width="512" height="512" rx="114" fill="url(#stockalgo-specular)" />
+  <rect x="8" y="8" width="496" height="496" rx="106" fill="none" stroke="url(#stockalgo-rim)" stroke-width="4" />
+
+  <!-- 2. Technical Coordinate Grid -->
+  <g opacity="0.55">
+    <line x1="76" y1="185" x2="436" y2="185" stroke="#FFFFFF" stroke-opacity="0.1" stroke-dasharray="6 8" stroke-width="1.5" />
+    <line x1="76" y1="285" x2="436" y2="285" stroke="#FFFFFF" stroke-opacity="0.1" stroke-dasharray="6 8" stroke-width="1.5" />
+    <line x1="76" y1="385" x2="436" y2="385" stroke="#FFFFFF" stroke-opacity="0.1" stroke-dasharray="6 8" stroke-width="1.5" />
+  </g>
+
+  <!-- 3. Candlesticks: 3 Historical + 1 AI Forecast Pillar -->
+  <!-- Historical Bar 1 -->
+  <g>
+    <line x1="115" y1="275" x2="115" y2="415" stroke="#7DD3FC" stroke-width="3.5" stroke-linecap="round" opacity="0.5" />
+    <rect x="98" y="300" width="34" height="95" rx="8" fill="url(#stockalgo-bar1)" stroke="#BAE6FD" stroke-opacity="0.4" stroke-width="1.5" />
+  </g>
+
+  <!-- Historical Bar 2 -->
+  <g>
+    <line x1="183" y1="220" x2="183" y2="415" stroke="#7DD3FC" stroke-width="3.5" stroke-linecap="round" opacity="0.65" />
+    <rect x="166" y="245" width="34" height="150" rx="8" fill="url(#stockalgo-bar2)" stroke="#BAE6FD" stroke-opacity="0.5" stroke-width="1.5" />
+  </g>
+
+  <!-- Historical Bar 3 -->
+  <g>
+    <line x1="251" y1="160" x2="251" y2="415" stroke="#7DD3FC" stroke-width="3.5" stroke-linecap="round" opacity="0.8" />
+    <rect x="234" y="185" width="34" height="210" rx="8" fill="url(#stockalgo-bar3)" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1.5" />
+  </g>
+
+  <!-- AI Predicted Pillar 4 -->
+  <g>
+    <line x1="319" y1="115" x2="319" y2="415" stroke="#38BDF8" stroke-width="3.5" stroke-linecap="round" opacity="0.85" />
+    <rect x="302" y="135" width="34" height="260" rx="8" fill="url(#stockalgo-bar4)" stroke="#67E8F9" stroke-width="2" stroke-opacity="0.9" />
+  </g>
+
+  <!-- 4. Area Gradient Under Prediction Curve -->
+  <path d="M 80 360 C 145 355, 190 290, 251 225 C 310 160, 360 125, 420 102 L 440 420 L 80 420 Z" fill="url(#stockalgo-area)" mask="url(#stockalgo-mask)" />
+
+  <!-- 5. Trajectory Glow Underlayer -->
+  <path d="M 80 360 C 145 355, 190 290, 251 225 C 310 160, 360 125, 420 102" fill="none" stroke="#00E5FF" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" opacity="0.45" filter="url(#stockalgo-glow)" />
+
+  <!-- 6. Trajectory Main Vector -->
+  <path d="M 80 360 C 145 355, 190 290, 251 225 C 310 160, 360 125, 420 102" fill="none" stroke="url(#stockalgo-traj)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- 7. Discrete Algorithmic Data Nodes -->
+  <circle cx="115" cy="346" r="6" fill="#FFFFFF" opacity="0.95" />
+  <circle cx="183" cy="295" r="6" fill="#FFFFFF" opacity="0.98" />
+  <circle cx="251" cy="225" r="7.5" fill="#FFFFFF" />
+  <circle cx="319" cy="163" r="7.5" fill="#FFFFFF" />
+
+  <!-- 8. AI Target Apex Beacon & Starburst -->
+  <!-- Target Reticle Orbit Ring -->
+  <circle cx="420" cy="102" r="28" fill="none" stroke="#38BDF8" stroke-width="2.5" stroke-dasharray="5 4" opacity="0.9" />
+  <!-- Target Radial Glow Halo -->
+  <circle cx="420" cy="102" r="20" fill="url(#stockalgo-node-halo)" opacity="0.85" />
+  <!-- Core Target Center -->
+  <circle cx="420" cy="102" r="9.5" fill="#FFFFFF" />
+
+  <!-- AI Prediction Diamond Starburst -->
+  <path d="M 420 72 L 424.5 97.5 L 450 102 L 424.5 106.5 L 420 132 L 415.5 106.5 L 390 102 L 415.5 97.5 Z" fill="#FFFFFF" filter="url(#stockalgo-spark)" opacity="0.95" />
+</svg>

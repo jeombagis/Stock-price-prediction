@@ -1,3 +1,8 @@
+export type ModelKey = 'XGB' | 'RF' | 'LGBM' | 'LR' | 'Ensemble';
+export type DirectionLabel = '상승' | '하락/보합';
+export type OverallDirection = '상승 우세 ↑' | '하락/보합 우세 ↓' | '중립 / 관망 ↔';
+export type Signal = 0 | 1;
+
 export interface AssetInfo {
   id: string;
   name: string;
@@ -14,8 +19,8 @@ export interface AssetsResponse {
 
 export interface ModelPredictionDetail {
   model_name: string;
-  signal: number; // 1: 상승, 0: 하락
-  direction: string; // "상승" | "하락/보합"
+  signal: Signal;
+  direction: DirectionLabel;
   probability: number;
   f1_score?: number;
   accuracy?: number;
@@ -31,7 +36,7 @@ export interface PredictionOverviewResponse {
   prev_close: number;
   daily_change_pct: number;
   overall_direction: string;
-  overall_signal: number;
+  overall_signal: Signal;
   avg_probability: number;
   confidence_score: number;
   ai_opinion: string;
@@ -40,7 +45,8 @@ export interface PredictionOverviewResponse {
     window_size: number;
     threshold: number;
     train_split: number;
-    fast_mode: boolean;
+    fast_mode?: boolean;
+    model_source?: string;
   };
 }
 

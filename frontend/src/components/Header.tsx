@@ -1,6 +1,7 @@
 import React from 'react';
-import { TrendingUp, RefreshCw, Sliders, Scale } from 'lucide-react';
+import { RefreshCw, Sliders, Scale } from 'lucide-react';
 import { AssetInfo } from '../types';
+import { Logo } from './Logo';
 
 interface HeaderProps {
   currentAsset: string;
@@ -11,7 +12,6 @@ interface HeaderProps {
   isLoading: boolean;
   isSyncing?: boolean;
   presets: AssetInfo[];
-  popular?: AssetInfo[];
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -29,22 +29,21 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 gap-3 sm:gap-4">
           
-          {/* Brand Logo & Title (Neutral Non-commercial Research Branding) */}
+          {/* Brand Logo & Title (StockAlgo AI Branding) */}
           <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
-            <div className="flex items-center gap-2.5 group cursor-pointer" onClick={() => onSelectAsset('SnP500')}>
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0071e3] text-white flex items-center justify-center shadow-[0_2px_10px_rgba(0,113,227,0.28)] transition-transform duration-200 group-hover:scale-105">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white stroke-[2.5]" />
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-base sm:text-lg font-extrabold tracking-tight text-[#1d1d1f]">
-                    StockAlgo AI
-                  </span>
-                  <span className="hidden sm:inline-flex text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#0071e3]/[0.08] text-[#0071e3] border border-[#0071e3]/20">
-                    S&P 500 · NASDAQ-100 · ML 모델 운용
-                  </span>
-                </div>
-              </div>
+            <div 
+              className="flex items-center gap-2.5 group cursor-pointer" 
+              onClick={() => onSelectAsset('SnP500')}
+              tabIndex={0}
+              role="button"
+              onKeyDown={(e) => e.key === 'Enter' && onSelectAsset('SnP500')}
+            >
+              <Logo 
+                size={36} 
+                showText={true} 
+                showBadge={true} 
+                iconClassName="transition-all duration-200 group-hover:scale-105 group-hover:shadow-[0_4px_16px_rgba(0,113,227,0.38)]"
+              />
             </div>
           </div>
 
@@ -58,6 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     key={preset.id}
                     onClick={() => onSelectAsset(preset.id)}
+                    aria-pressed={isActive}
                     className={`segmented-btn flex-1 justify-center text-xs font-semibold ${isActive ? 'selected' : ''}`}
                   >
                     {preset.name}
@@ -115,6 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   key={preset.id}
                   onClick={() => onSelectAsset(preset.id)}
+                  aria-pressed={isActive}
                   className={`segmented-btn flex-1 justify-center text-xs ${isActive ? 'selected' : ''}`}
                 >
                   {preset.name}

@@ -7,6 +7,7 @@ import { FeatureImportance } from './components/FeatureImportance';
 import { BacktestTable } from './components/BacktestTable';
 import { ParameterModal } from './components/ParameterModal';
 import { LegalModal } from './components/LegalModal';
+import { Logo } from './components/Logo';
 import { api } from './services/api';
 import {
   AssetInfo,
@@ -27,7 +28,7 @@ export const App: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [dataVersion, setDataVersion] = useState<number>(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isParamModalOpen, setIsParamModalOpen] = useState<boolean>(false);
@@ -62,26 +63,32 @@ export const App: React.FC = () => {
   }, []);
 
   // 2. Load Prediction and Chart Data for Current Asset
-  const loadData = async (asset: string, forceSync = false) => {
+  const loadData = async (asset: string, forceSync = false, signal?: AbortSignal) => {
     setLoading(true);
     setError(null);
     try {
       const [predRes, chartRes] = await Promise.all([
-        api.getPrediction(asset, forceSync),
-        api.getChartData(asset, 120),
+        api.getPrediction(asset, forceSync, signal),
+        api.getChartData(asset, 120, signal),
       ]);
+      if (signal?.aborted) return;
       setPrediction(predRes);
       setChartData(chartRes);
     } catch (err: any) {
+      if (signal?.aborted) return;
       console.error("Data load error:", err);
       setError(err.response?.data?.detail || "데이터를 불러오는 중 문제가 발생했습니다. 티커가 올바른지 확인해주세요.");
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    loadData(currentAsset);
+    const controller = new AbortController();
+    loadData(currentAsset, false, controller.signal);
+    return () => controller.abort();
   }, [currentAsset]);
 
   const handleSelectAsset = (assetId: string) => {
@@ -92,7 +99,7 @@ export const App: React.FC = () => {
     setIsSyncing(true);
     try {
       await loadData(currentAsset, true);
-      setRefreshKey((prev) => prev + 1);
+      setDataVersion((prev) => prev + 1);
       showToast(`'${currentAsset}' 최신 시장 데이터 동기화가 완료되었습니다.`);
     } catch (err) {
       console.error("Refresh failed:", err);
@@ -103,7 +110,7 @@ export const App: React.FC = () => {
 
   const handleRetrainSuccess = (newPrediction: PredictionOverviewResponse) => {
     setPrediction(newPrediction);
-    setRefreshKey((prev) => prev + 1);
+    setDataVersion((prev) => prev + 1);
     api.getChartData(currentAsset, 120).then(setChartData).catch(console.error);
     showToast(`'${newPrediction.asset_name}' 모델 재학습 및 성능 지표 갱신이 완료되었습니다.`);
   };
@@ -225,12 +232,12 @@ export const App: React.FC = () => {
               </div>
 
               <div className="lg:col-span-5">
-                <FeatureImportance assetKey={currentAsset} refreshKey={refreshKey} />
+                <FeatureImportance assetKey={currentAsset} refreshKey={dataVersion} />
               </div>
             </div>
 
             {/* 4. Backtesting & Historical Performance */}
-            <BacktestTable assetKey={currentAsset} refreshKey={refreshKey} />
+            <BacktestTable assetKey={currentAsset} refreshKey={dataVersion} />
           </div>
         )}
       </main>
@@ -256,6 +263,7 @@ export const App: React.FC = () => {
       <footer className="mt-8 border-t border-black/[0.06] bg-white/70 backdrop-blur-[20px] py-6 text-center text-xs text-[#86868b] z-10">
         <div className="max-w-[1280px] mx-auto px-4 space-y-2">
           <div className="flex flex-wrap items-center justify-center gap-2">
+            <Logo size={20} iconClassName="!rounded-md !shadow-[0_1px_4px_rgba(0,113,227,0.2)]" />
             <span className="font-bold text-[#1d1d1f]">StockAlgo AI (주가 알고리즘 분석)</span>
             <span className="text-[#86868b]">·</span>
             <span>비상업적 연구 프로젝트 (Non-commercial Research Project)</span>

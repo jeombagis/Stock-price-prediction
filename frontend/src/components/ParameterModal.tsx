@@ -7,11 +7,11 @@ interface ParameterModalProps {
   isOpen: boolean;
   onClose: () => void;
   assetKey: string;
-  currentParams: {
-    window_size: number;
-    threshold: number;
-    train_split: number;
-    fast_mode: boolean;
+  currentParams?: {
+    window_size?: number;
+    threshold?: number;
+    train_split?: number;
+    fast_mode?: boolean;
   };
   onRetrainSuccess: (newPrediction: PredictionOverviewResponse) => void;
 }
@@ -23,15 +23,31 @@ export const ParameterModal: React.FC<ParameterModalProps> = ({
   currentParams,
   onRetrainSuccess,
 }) => {
-  const [windowSize, setWindowSize] = useState<number>(currentParams.window_size || 5);
-  const [threshold, setThreshold] = useState<number>(currentParams.threshold || 0.002);
-  const [trainSplit, setTrainSplit] = useState<number>(currentParams.train_split || 0.8);
-  const [fastMode, setFastMode] = useState<boolean>(currentParams.fast_mode ?? true);
+  const [windowSize, setWindowSize] = useState<number>(currentParams?.window_size || 5);
+  const [threshold, setThreshold] = useState<number>(currentParams?.threshold ?? 0.002);
+  const [trainSplit, setTrainSplit] = useState<number>(currentParams?.train_split ?? 0.8);
+  const [fastMode, setFastMode] = useState<boolean>(currentParams?.fast_mode ?? true);
   const [forceSync, setForceSync] = useState<boolean>(false);
   const [isTraining, setIsTraining] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+  React.useEffect(() => {
+    if (isOpen && currentParams) {
+      setWindowSize(currentParams.window_size || 5);
+      setThreshold(currentParams.threshold ?? 0.002);
+      setTrainSplit(currentParams.train_split ?? 0.8);
+      setFastMode(currentParams.fast_mode ?? true);
+      setErrorMsg(null);
+    }
+  }, [isOpen, currentParams]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +68,13 @@ export const ParameterModal: React.FC<ParameterModalProps> = ({
       if (res.success) {
         onRetrainSuccess(res.prediction);
         onClose();
+      } else {
+        setErrorMsg(res.message || "재학습 요청에 실패했습니다.");
       }
     } catch (err: any) {
       console.error("Retrain failed:", err);
-      setErrorMsg(err.response?.data?.detail || "재학습 중 오류가 발생했습니다.");
+      const msg = err.message || err.response?.data?.detail || "재학습 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+      setErrorMsg(typeof msg === 'string' ? msg : JSON.stringify(msg));
     } finally {
       setIsTraining(false);
     }
@@ -68,9 +87,15 @@ export const ParameterModal: React.FC<ParameterModalProps> = ({
     setFastMode(true);
   };
 
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/25 backdrop-blur-[24px] animate-in fade-in duration-200">
-      <div className="glass-panel !bg-white/95 !rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-glass-hover space-y-5 relative">
+      <div 
+        className="glass-panel !bg-white/95 !rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-glass-hover space-y-5 relative"
+        role="dialog"
+        aria-modal="true"
+      >
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
           <div className="flex items-center gap-2">
@@ -149,12 +174,13 @@ export const ParameterModal: React.FC<ParameterModalProps> = ({
               min="1"
               max="20"
               step="1"
-              value={windowSize}
-              onChange={(e) => setWindowSize(parseInt(e.target.value))}
-              className="w-full h-1.5 bg-black/[0.08] rounded-lg appearance-none cursor-pointer accent-[#0071e3]"
+              value={5}
+              readOnly
+              disabled
+              className="w-full h-1.5 bg-black/[0.08] rounded-lg appearance-none cursor-not-allowed accent-[#0071e3] opacity-50"
             />
             <p className="text-[11px] text-[#86868b]">
-              과거 N일간의 기술적 지표 변화량을 모델 피처로 압축합니다.
+              현재 모델 호환성을 위해 5일로 고정되어 있습니다. 과거 N일간의 기술적 지표 변화량을 모델 피처로 압축합니다.
             </p>
           </div>
 

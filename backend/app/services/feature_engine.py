@@ -1,10 +1,14 @@
+import logging
 from typing import List, Tuple, Dict
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from app.config import AppConfig
 
-FEATURE_DESCRIPTIONS: Dict[str, str] = {
+logger = logging.getLogger(__name__)
+
+# 기본 피처 설명 (불변 — 인스턴스에서 lag 피처 설명을 별도 관리)
+BASE_FEATURE_DESCRIPTIONS: Dict[str, str] = {
     "return": "전일 대비 일간 종가 등락률",
     "vol_change": "전일 대비 일간 거래량 변동률",
     "high_low_gap": "당일 장중 고가-저가 변동폭 비율 (고가-저가)/시가",
@@ -25,22 +29,28 @@ FEATURE_DESCRIPTIONS: Dict[str, str] = {
     "EMA_50": "50일 지수이동평균 비율 (EMA_50 / 종가)",
 }
 
+# 하위 호환성을 위한 전역 참조 (model_engine.py에서 import)
+FEATURE_DESCRIPTIONS: Dict[str, str] = {**BASE_FEATURE_DESCRIPTIONS}
+
+
 class FeatureEngine:
     def __init__(self, window_size: int = AppConfig.WINDOW_SIZE, threshold: float = AppConfig.THRESHOLD):
         self.window_size = window_size
         self.threshold = threshold
         self.scaler = StandardScaler()
         self.features: List[str] = []
+        # 인스턴스별 피처 설명 (전역 상태 오염 방지)
+        self.feature_descriptions: Dict[str, str] = {**BASE_FEATURE_DESCRIPTIONS}
 
     def compute_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         차트 표시 및 피처 생성을 위한 기술적 지표 계산
         """
         df = df.copy()
-        
-        # 1. 기본 변동성 지표
+
+        # 1. 기본 변동성 지표 (inf/nan 처리 통일)
         df['return'] = df['close'].pct_change()
-        df['vol_change'] = df['volume'].pct_change().replace([np.inf, -np.inf], 0)
+        df['vol_change'] = df['volume'].pct_change().replace([np.inf, -np.inf], np.nan)
         df['high_low_gap'] = (df['high'] - df['low']) / df['open'].replace(0, np.nan)
 
         # 2. RSI (14일)
@@ -90,13 +100,13 @@ class FeatureEngine:
         df['ROC_10'] = df['close'].pct_change(periods=10)
         df['ROC_20'] = df['close'].pct_change(periods=20)
 
-        # 9. 시차(Lag) 피처
+        # 9. 시차(Lag) 피처 — 인스턴스 수준에서 설명 관리 (전역 상태 오염 방지)
         lag_features = {}
         for i in range(1, self.window_size + 1):
             lag_features[f'return_lag_{i}'] = df['return'].shift(i)
             lag_features[f'vol_lag_{i}'] = df['vol_change'].shift(i)
-            FEATURE_DESCRIPTIONS[f'return_lag_{i}'] = f"{i}일 전 수익률"
-            FEATURE_DESCRIPTIONS[f'vol_lag_{i}'] = f"{i}일 전 거래량 변동률"
+            self.feature_descriptions[f'return_lag_{i}'] = f"{i}일 전 수익률"
+            self.feature_descriptions[f'vol_lag_{i}'] = f"{i}일 전 거래량 변동률"
 
         df = pd.concat([df, pd.DataFrame(lag_features, index=df.index)], axis=1)
 
