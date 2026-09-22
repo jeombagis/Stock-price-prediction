@@ -21,24 +21,28 @@ export const FeatureImportance: React.FC<FeatureImportanceProps> = ({ assetKey, 
   const [features, setFeatures] = useState<FeatureImportanceItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    let isMounted = true;
-    const loadFeatureImportance = async () => {
-      setLoading(true);
-      try {
-        const res = await api.getFeatureImportance(assetKey, selectedModel);
-        if (isMounted) {
-          setFeatures(res.features);
-        }
-      } catch (err) {
-        console.error("Failed to load feature importance:", err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
+  const [error, setError] = useState<string | null>(null);
 
-    loadFeatureImportance();
-    return () => { isMounted = false; };
+  const loadFeatureImportance = async (signal?: AbortSignal) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.getFeatureImportance(assetKey, selectedModel, signal);
+      if (signal?.aborted) return;
+      setFeatures(res.features);
+    } catch (err: any) {
+      if (signal?.aborted) return;
+      console.error("Failed to load feature importance:", err);
+      setError("데이터를 불러오지 못했습니다.");
+    } finally {
+      if (!signal?.aborted) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const controller = new AbortController();
+    loadFeatureImportance(controller.signal);
+    return () => controller.abort();
   }, [assetKey, selectedModel, refreshKey]);
 
   const chartData = [...features].reverse();
@@ -77,6 +81,11 @@ export const FeatureImportance: React.FC<FeatureImportanceProps> = ({ assetKey, 
             <div className="w-4 h-4 border-2 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
             <span className="font-semibold text-[#515154]">피처 중요도 산출 중...</span>
           </div>
+        </div>
+      ) : error ? (
+        <div className="h-64 flex flex-col items-center justify-center text-xs text-[#86868b] space-y-2">
+          <span>{error}</span>
+          <button onClick={() => loadFeatureImportance()} className="px-3 py-1.5 bg-[#0071e3] text-white rounded-md">다시 시도</button>
         </div>
       ) : features.length === 0 ? (
         <div className="h-64 flex items-center justify-center text-xs text-[#86868b]">

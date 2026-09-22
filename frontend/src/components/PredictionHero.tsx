@@ -6,9 +6,12 @@ interface PredictionHeroProps {
   data: PredictionOverviewResponse;
 }
 
+const BULLISH_THRESHOLD = 0.52;
+const BEARISH_THRESHOLD = 0.48;
+
 export const PredictionHero: React.FC<PredictionHeroProps> = ({ data }) => {
-  const isBullish = data.avg_probability >= 0.52;
-  const isBearish = data.avg_probability <= 0.48;
+  const isBullish = data.avg_probability >= BULLISH_THRESHOLD;
+  const isBearish = data.avg_probability <= BEARISH_THRESHOLD;
   const isNeutral = !isBullish && !isBearish;
 
   const probPercent = (data.avg_probability * 100).toFixed(1);
@@ -93,7 +96,13 @@ export const PredictionHero: React.FC<PredictionHeroProps> = ({ data }) => {
               </span>
             </div>
             
-            <div className="h-3 w-full bg-black/[0.06] rounded-full overflow-hidden p-0.5 border border-black/[0.04]">
+            <div 
+              className="h-3 w-full bg-black/[0.06] rounded-full overflow-hidden p-0.5 border border-black/[0.04]"
+              role="progressbar"
+              aria-valuenow={Math.min(Math.max(data.avg_probability * 100, 5), 100)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
               <div 
                 className={`h-full rounded-full transition-all duration-500 ${
                   isBullish

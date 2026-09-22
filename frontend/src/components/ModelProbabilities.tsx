@@ -48,7 +48,10 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-        {Object.entries(models).map(([name, detail]) => {
+        {['Ensemble', 'XGB', 'RF', 'LGBM', 'LR']
+          .filter(name => models[name])
+          .map((name) => {
+          const detail = models[name];
           const isUp = detail.signal === 1;
           const probPct = (detail.probability * 100).toFixed(1);
           const meta = MODEL_INFO[name] || {
@@ -103,7 +106,13 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
                     <span className="text-[#86868b] font-medium">상승 확률</span>
                     <span className="font-mono font-bold text-[#1d1d1f]">{probPct}%</span>
                   </div>
-                  <div className="h-2 w-full bg-black/[0.05] rounded-full overflow-hidden p-0.5 border border-black/[0.03]">
+                  <div 
+                    className="h-2 w-full bg-black/[0.05] rounded-full overflow-hidden p-0.5 border border-black/[0.03]"
+                    role="progressbar"
+                    aria-valuenow={detail.probability * 100}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         isUp ? 'bg-[#e02424]' : 'bg-[#059669]'

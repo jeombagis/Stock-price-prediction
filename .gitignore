@@ -1,7 +1,27 @@
-*.csv
-*.DS_Store
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+*.egg-info/
+
+# Jupyter
 .ipynb_checkpoints/
+
+# Environment
+.env
+.venv/
+
+# Data cache (generated at runtime)
+backend/data_cache/*.csv
+
+# macOS
+*.DS_Store
+
+# Node.js
+node_modules/
+frontend/dist/
+
+# ML model files (large binary, regenerate via model/train_models.py)
+# Uncomment below to exclude .pkl files from git tracking:
+# saved_models/*.pkl

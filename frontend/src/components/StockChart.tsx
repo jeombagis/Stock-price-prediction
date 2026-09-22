@@ -28,6 +28,14 @@ export const StockChart: React.FC<StockChartProps> = ({ points, assetName, ticke
   const filteredPoints = points.slice(-range);
   const lastPoint = filteredPoints[filteredPoints.length - 1];
 
+  if (filteredPoints.length === 0) {
+    return (
+      <div className="glass-panel !rounded-3xl p-5 sm:p-6 h-64 flex items-center justify-center text-sm text-[#86868b]">
+        차트 데이터를 표시할 수 없습니다.
+      </div>
+    );
+  }
+
   return (
     <div className="glass-panel !rounded-3xl p-5 sm:p-6 space-y-4">
       {/* Chart Header & Controls */}

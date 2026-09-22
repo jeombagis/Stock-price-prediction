@@ -1,21 +1,62 @@
-from typing import Dict, Any, List, Tuple, Optional
-from datetime import datetime, timedelta
+import logging
+from typing import Dict, Any, List, Optional
+from datetime import datetime, timedelta, date
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import joblib
-from sklearn.model_selection import TimeSeriesSplit, RandomizedSearchCV
 from sklearn.metrics import accuracy_score, f1_score
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, VotingClassifier
-from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
 
 from app.config import AppConfig, SAVED_MODELS_DIR
-from app.services.feature_engine import FEATURE_DESCRIPTIONS
+from app.services.feature_engine import BASE_FEATURE_DESCRIPTIONS
 from app.models.schemas import ModelPredictionDetail, FeatureImportanceItem
 
+logger = logging.getLogger(__name__)
+
 _ENGINE_CACHE: Dict[str, "ModelEngine"] = {}
+
+# 미국 증시 주요 공휴일 (매년 고정일 + 근사일)
+_US_MARKET_HOLIDAYS_FIXED = {
+    (1, 1),   # New Year's Day
+    (7, 4),   # Independence Day
+    (12, 25), # Christmas Day
+}
+
+
+def _is_us_market_holiday(d: date) -> bool:
+    """미국 증시 공휴일 여부를 간이 판정 (주요 고정 공휴일 + 주말)"""
+    if d.weekday() >= 5:  # 토/일
+        return True
+    if (d.month, d.day) in _US_MARKET_HOLIDAYS_FIXED:
+        return True
+    # Martin Luther King Jr. Day: 1월 셋째 월요일
+    if d.month == 1 and d.weekday() == 0 and 15 <= d.day <= 21:
+        return True
+    # Presidents' Day: 2월 셋째 월요일
+    if d.month == 2 and d.weekday() == 0 and 15 <= d.day <= 21:
+        return True
+    # Memorial Day: 5월 마지막 월요일
+    if d.month == 5 and d.weekday() == 0 and d.day >= 25:
+        return True
+    # Labor Day: 9월 첫째 월요일
+    if d.month == 9 and d.weekday() == 0 and d.day <= 7:
+        return True
+    # Thanksgiving: 11월 넷째 목요일
+    if d.month == 11 and d.weekday() == 3 and 22 <= d.day <= 28:
+        return True
+    return False
+
+
+def _next_trading_day(from_date: date) -> date:
+    """다음 거래일 계산 (주말 + 미국 공휴일 건너뛰기)"""
+    candidate = from_date + timedelta(days=1)
+    max_attempts = 10
+    for _ in range(max_attempts):
+        if not _is_us_market_holiday(candidate):
+            return candidate
+        candidate += timedelta(days=1)
+    return candidate
+
 
 class ModelEngine:
     def __init__(self, fast_mode: bool = True):
@@ -51,6 +92,7 @@ class ModelEngine:
                 f"model/train_models.py를 실행하여 모델을 생성해 주세요."
             )
 
+        logger.info(f"[{norm_key}] 사전 학습 모델 로딩: {bundle_path}")
         bundle = joblib.load(bundle_path)
         scaler = joblib.load(scaler_path)
 
@@ -68,6 +110,7 @@ class ModelEngine:
         engine.scaler = scaler
 
         _ENGINE_CACHE[norm_key] = engine
+        logger.info(f"[{norm_key}] 모델 로딩 완료 (피처 {len(engine.features)}개, 모델 {len(engine.models)}개)")
         return engine
 
     def scale_features(self, X_raw: pd.DataFrame) -> pd.DataFrame:
@@ -81,110 +124,6 @@ class ModelEngine:
         scaled = self.scaler.transform(X_raw[cols])
         return pd.DataFrame(scaled, columns=cols, index=X_raw.index)
 
-    def train_models(self, X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.DataFrame, y_test: pd.Series):
-        """
-        5대 모델 학습 및 평가
-        """
-        # 1. Base Classifiers
-        neg_count = sum(y_train == 0)
-        pos_count = sum(y_train == 1)
-        scale_pos = (neg_count / pos_count) if pos_count > 0 else 1.0
-
-        base_xgb = XGBClassifier(random_state=42, scale_pos_weight=scale_pos, eval_metric='logloss')
-        base_rf = RandomForestClassifier(random_state=42, class_weight='balanced')
-        base_lgbm = LGBMClassifier(random_state=42, verbose=-1, class_weight='balanced')
-        base_lr = LogisticRegression(random_state=42, class_weight='balanced', max_iter=1000)
-
-        # Time-decay Sample Weights
-        sample_weights = np.linspace(0.1, 1.0, len(y_train))
-
-        if self.fast_mode:
-            # 빠른 서빙을 위한 검증된 고정 최적 파라미터
-            best_xgb = XGBClassifier(
-                n_estimators=100, learning_rate=0.03, max_depth=4,
-                subsample=0.8, colsample_bytree=0.8, random_state=42,
-                scale_pos_weight=scale_pos, eval_metric='logloss'
-            )
-            best_rf = RandomForestClassifier(n_estimators=100, max_depth=7, min_samples_split=3, class_weight='balanced', random_state=42)
-            best_lgbm = LGBMClassifier(n_estimators=100, learning_rate=0.03, max_depth=4, class_weight='balanced', verbose=-1, random_state=42)
-            best_lr = LogisticRegression(C=0.1, class_weight='balanced', max_iter=1000, random_state=42)
-        else:
-            # TimeSeriesSplit 기반 하이퍼파라미터 최적화
-            tscv = TimeSeriesSplit(n_splits=3)
-            xgb_params = {'n_estimators': [100, 200], 'learning_rate': [0.01, 0.03, 0.05], 'max_depth': [3, 4, 5]}
-            rf_params = {'n_estimators': [100, 200], 'max_depth': [5, 7, 10], 'min_samples_split': [2, 5]}
-            lgbm_params = {'n_estimators': [100, 200], 'learning_rate': [0.01, 0.03, 0.05], 'max_depth': [3, 4, 5]}
-            lr_params = {'C': [0.01, 0.1, 1, 10]}
-
-            search_xgb = RandomizedSearchCV(base_xgb, xgb_params, n_iter=4, cv=tscv, scoring='f1_macro', n_jobs=-1, random_state=42)
-            search_rf = RandomizedSearchCV(base_rf, rf_params, n_iter=4, cv=tscv, scoring='f1_macro', n_jobs=-1, random_state=42)
-            search_lgbm = RandomizedSearchCV(base_lgbm, lgbm_params, n_iter=4, cv=tscv, scoring='f1_macro', n_jobs=-1, random_state=42)
-            search_lr = RandomizedSearchCV(base_lr, lr_params, n_iter=3, cv=tscv, scoring='f1_macro', n_jobs=-1, random_state=42)
-
-            search_xgb.fit(X_train, y_train)
-            search_rf.fit(X_train, y_train)
-            search_lgbm.fit(X_train, y_train)
-            search_lr.fit(X_train, y_train)
-
-            best_xgb = search_xgb.best_estimator_
-            best_rf = search_rf.best_estimator_
-            best_lgbm = search_lgbm.best_estimator_
-            best_lr = search_lr.best_estimator_
-
-        ensemble = VotingClassifier(
-            estimators=[('XGB', best_xgb), ('RF', best_rf), ('LGBM', best_lgbm), ('LR', best_lr)],
-            voting='soft'
-        )
-
-        self.models = {
-            'XGB': best_xgb,
-            'RF': best_rf,
-            'LGBM': best_lgbm,
-            'LR': best_lr,
-            'Ensemble': ensemble
-        }
-
-        # 개별 모델 학습 및 임계치/지표 산출
-        for name, model in self.models.items():
-            try:
-                model.fit(X_train, y_train, sample_weight=sample_weights)
-            except Exception:
-                try:
-                    model.fit(
-                        X_train, y_train,
-                        XGB__sample_weight=sample_weights,
-                        RF__sample_weight=sample_weights,
-                        LGBM__sample_weight=sample_weights,
-                        LR__sample_weight=sample_weights
-                    )
-                except Exception:
-                    model.fit(X_train, y_train)
-
-            # Train Set 내부에서 최적 Threshold 탐색 (Data Leakage 차단)
-            probs_train = model.predict_proba(X_train)[:, 1]
-            best_thresh = 0.5
-            best_f1 = 0.0
-            for th in np.arange(0.40, 0.60, 0.02):
-                preds_th = (probs_train > th).astype(int)
-                score = f1_score(y_train, preds_th, average='macro', zero_division=0)
-                if score > best_f1:
-                    best_f1 = score
-                    best_thresh = float(th)
-
-            self.best_thresholds[name] = best_thresh
-
-            # Test Set Out-of-Sample 검증
-            probs_test = model.predict_proba(X_test)[:, 1]
-            final_preds = (probs_test > best_thresh).astype(int)
-            acc = float(accuracy_score(y_test, final_preds))
-            f1 = float(f1_score(y_test, final_preds, average='macro', zero_division=0))
-
-            self.eval_metrics[name] = {
-                'accuracy': round(acc, 4),
-                'f1_score': round(f1, 4),
-                'threshold': round(best_thresh, 4)
-            }
-
     def predict_next_day(self, X_last: pd.DataFrame, last_row_df: pd.Series) -> Dict[str, Any]:
         """
         가장 최신 데이터를 바탕으로 익일 주가 예측 수행
@@ -196,12 +135,8 @@ class ModelEngine:
         except Exception:
             last_date_obj = datetime.now()
 
-        # 다음 거래일 계산 (주말 건너뛰기)
-        target_date_obj = last_date_obj + timedelta(days=1)
-        if target_date_obj.weekday() == 5: # 토요일 -> 월요일
-            target_date_obj += timedelta(days=2)
-        elif target_date_obj.weekday() == 6: # 일요일 -> 월요일
-            target_date_obj += timedelta(days=1)
+        # 다음 거래일 계산 (주말 + 미국 공휴일 건너뛰기)
+        target_date_obj = _next_trading_day(last_date_obj.date())
 
         model_details: Dict[str, ModelPredictionDetail] = {}
         probabilities = []
@@ -211,7 +146,7 @@ class ModelEngine:
             thresh = self.best_thresholds.get(name, 0.5)
             signal = 1 if prob >= thresh else 0
             direction = "상승" if signal == 1 else "하락/보합"
-            
+
             metrics = self.eval_metrics.get(name, {})
             model_details[name] = ModelPredictionDetail(
                 model_name=name,
@@ -244,7 +179,7 @@ class ModelEngine:
 
         return {
             'base_date': last_date_obj.strftime('%Y-%m-%d'),
-            'target_date': target_date_obj.strftime('%Y-%m-%d'),
+            'target_date': datetime.combine(target_date_obj, datetime.min.time()).strftime('%Y-%m-%d'),
             'overall_direction': overall_direction,
             'overall_signal': overall_signal,
             'avg_probability': round(avg_prob, 4),
@@ -255,12 +190,21 @@ class ModelEngine:
 
     def get_feature_importances(self, features: List[str], model_name: str = 'XGB') -> List[FeatureImportanceItem]:
         """
-        모델의 피처 중요도 반환
+        모델의 피처 중요도 반환. 피처 중요도를 지원하지 않는 모델은 XGBoost로 대체하여 반환합니다.
         """
+        actual_model_name = model_name
         model = self.models.get(model_name)
+
         if model is None or not hasattr(model, 'feature_importances_'):
             # 모델이 피처 중요도를 직접 지원하지 않으면 XGBoost로 대체
-            model = self.models.get('XGB')
+            fallback = self.models.get('XGB')
+            if fallback is not None and hasattr(fallback, 'feature_importances_'):
+                model = fallback
+                actual_model_name = 'XGB'
+                logger.info(f"'{model_name}' 모델은 피처 중요도를 지원하지 않아 XGBoost 중요도를 반환합니다.")
+            else:
+                logger.warning(f"피처 중요도를 제공할 수 있는 모델이 없습니다.")
+                return []
 
         if model is not None and hasattr(model, 'feature_importances_'):
             importances = model.feature_importances_
@@ -272,7 +216,7 @@ class ModelEngine:
 
             items = []
             for feat, imp in zip(features, normalized):
-                desc = FEATURE_DESCRIPTIONS.get(feat, feat)
+                desc = BASE_FEATURE_DESCRIPTIONS.get(feat, feat)
                 items.append(FeatureImportanceItem(
                     feature=feat,
                     importance=round(float(imp), 4),
@@ -282,5 +226,5 @@ class ModelEngine:
             # 중요도 내림차순 정렬 후 상위 15개
             items = sorted(items, key=lambda x: x.importance, reverse=True)[:15]
             return items
-        
+
         return []

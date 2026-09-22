@@ -13,22 +13,28 @@ export const BacktestTable: React.FC<BacktestTableProps> = ({ assetKey, refreshK
   const [data, setData] = useState<BacktestSummaryResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    let isMounted = true;
-    const loadBacktest = async () => {
-      setLoading(true);
-      try {
-        const res = await api.getBacktest(assetKey, days);
-        if (isMounted) setData(res);
-      } catch (err) {
-        console.error("Failed to load backtest data:", err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
+  const [error, setError] = useState<string | null>(null);
 
-    loadBacktest();
-    return () => { isMounted = false; };
+  const loadBacktest = async (signal?: AbortSignal) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.getBacktest(assetKey, days, signal);
+      if (signal?.aborted) return;
+      setData(res);
+    } catch (err) {
+      if (signal?.aborted) return;
+      console.error("Failed to load backtest data:", err);
+      setError("데이터를 불러오지 못했습니다.");
+    } finally {
+      if (!signal?.aborted) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const controller = new AbortController();
+    loadBacktest(controller.signal);
+    return () => controller.abort();
   }, [assetKey, days, refreshKey]);
 
   return (
@@ -119,6 +125,11 @@ export const BacktestTable: React.FC<BacktestTableProps> = ({ assetKey, refreshK
             <div className="w-4 h-4 border-2 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
             <span className="font-semibold text-[#515154]">백테스트 히스토리 로드 중...</span>
           </div>
+        </div>
+      ) : error ? (
+        <div className="h-44 flex flex-col items-center justify-center text-xs text-[#86868b] space-y-2">
+          <span>{error}</span>
+          <button onClick={() => loadBacktest()} className="px-3 py-1.5 bg-[#0071e3] text-white rounded-md">다시 시도</button>
         </div>
       ) : !data || data.history.length === 0 ? (
         <div className="h-44 flex items-center justify-center text-xs text-[#86868b]">
