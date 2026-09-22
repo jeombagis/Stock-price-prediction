@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { TrendingUp, RefreshCw, Sliders, Search, ChevronDown, Scale } from 'lucide-react';
+import React from 'react';
+import { TrendingUp, RefreshCw, Sliders, Scale } from 'lucide-react';
 import { AssetInfo } from '../types';
 
 interface HeaderProps {
@@ -11,7 +11,7 @@ interface HeaderProps {
   isLoading: boolean;
   isSyncing?: boolean;
   presets: AssetInfo[];
-  popular: AssetInfo[];
+  popular?: AssetInfo[];
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -23,20 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   isLoading,
   isSyncing = false,
   presets,
-  popular,
 }) => {
-  const [customTicker, setCustomTicker] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (customTicker.trim()) {
-      onSelectAsset(customTicker.trim().toUpperCase());
-      setCustomTicker('');
-      setShowDropdown(false);
-    }
-  };
-
   return (
     <header className="sticky top-0 z-40 w-full bg-white/78 backdrop-blur-[28px] saturate-[180%] border-b border-black/[0.06] shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-200">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
@@ -54,17 +41,16 @@ export const Header: React.FC<HeaderProps> = ({
                     StockAlgo AI
                   </span>
                   <span className="hidden sm:inline-flex text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#0071e3]/[0.08] text-[#0071e3] border border-[#0071e3]/20">
-                    주가 알고리즘 분석 · S&P 500 · NASDAQ
+                    S&P 500 · NASDAQ-100 · ML 모델 운용
                   </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Center: Segmented Instrument Selector & Search */}
-          <div className="hidden md:flex items-center gap-2 flex-1 justify-center max-w-xl">
-            {/* Segmented Control Track */}
-            <div className="segmented-track">
+          {/* Center: Segmented Instrument Selector for S&P 500 & NASDAQ-100 */}
+          <div className="hidden md:flex items-center gap-2 flex-1 justify-center max-w-xs">
+            <div className="segmented-track w-full flex">
               {presets.map((preset) => {
                 const isActive = currentAsset.toLowerCase() === preset.id.toLowerCase() || 
                                  currentAsset.toLowerCase() === preset.ticker.toLowerCase();
@@ -72,57 +58,13 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     key={preset.id}
                     onClick={() => onSelectAsset(preset.id)}
-                    className={`segmented-btn ${isActive ? 'selected' : ''}`}
+                    className={`segmented-btn flex-1 justify-center text-xs font-semibold ${isActive ? 'selected' : ''}`}
                   >
                     {preset.name}
                   </button>
                 );
               })}
             </div>
-
-            {/* Popular Assets Dropdown Pill */}
-            <div className="relative">
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="glass-button !py-1.5 !px-3 text-xs font-semibold text-[#515154] hover:text-[#1d1d1f]"
-              >
-                <span>인기 종목</span>
-                <ChevronDown className="w-3.5 h-3.5 opacity-60" />
-              </button>
-
-              {showDropdown && (
-                <div className="absolute left-0 mt-2 w-52 bg-white/95 backdrop-blur-[24px] border border-black/[0.08] rounded-2xl shadow-glass-hover py-1.5 z-50 animate-in fade-in duration-150">
-                  <div className="px-3.5 py-1.5 text-[10px] font-bold text-[#86868b] uppercase tracking-wider">
-                    글로벌 주요 자산
-                  </div>
-                  {popular.map((item) => (
-                    <button
-                      key={item.ticker}
-                      onClick={() => {
-                        onSelectAsset(item.ticker);
-                        setShowDropdown(false);
-                      }}
-                      className="w-full text-left px-3.5 py-2 text-xs flex items-center justify-between hover:bg-black/[0.04] text-[#1d1d1f] transition"
-                    >
-                      <span className="font-bold text-[#0071e3]">{item.ticker}</span>
-                      <span className="text-[#86868b] text-[11px] truncate max-w-[100px]">{item.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Custom Ticker Search Input */}
-            <form onSubmit={handleSearch} className="relative w-36 lg:w-44">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b]" />
-              <input
-                type="text"
-                placeholder="티커 검색 (예: TSLA)"
-                value={customTicker}
-                onChange={(e) => setCustomTicker(e.target.value)}
-                className="w-full bg-white/80 border border-black/[0.08] rounded-full pl-8 pr-3 py-1.5 text-xs text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/15 transition shadow-[inset_0_1px_1px_rgba(0,0,0,0.02)]"
-              />
-            </form>
           </div>
 
           {/* Right Action Buttons */}
@@ -180,17 +122,6 @@ export const Header: React.FC<HeaderProps> = ({
               );
             })}
           </div>
-
-          <form onSubmit={handleSearch} className="relative w-32">
-            <Search className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#86868b]" />
-            <input
-              type="text"
-              placeholder="티커 (TSLA)"
-              value={customTicker}
-              onChange={(e) => setCustomTicker(e.target.value)}
-              className="w-full bg-white/90 border border-black/[0.08] rounded-full pl-7 pr-2 py-1 text-xs text-[#1d1d1f] placeholder-[#86868b] focus:outline-none"
-            />
-          </form>
         </div>
 
       </div>

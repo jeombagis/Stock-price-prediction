@@ -17,18 +17,17 @@ class DataService:
             asset_name (str): 표시용 자산 이름
             ticker (str): 자산 티커
         """
-        # 1. Preset 검사
-        preset_info = AppConfig.PRESET_ASSETS.get(identifier)
-        if preset_info:
-            asset_name = preset_info["name"]
-            ticker = preset_info["ticker"]
-            csv_path = AppConfig.get_csv_for_preset(identifier)
-        else:
-            ticker = identifier.strip().upper()
-            asset_name = ticker
-            csv_path = None
+        # 1. Preset 검사 (S&P 500 및 NASDAQ-100만 지원)
+        asset_key = AppConfig.resolve_asset_key(identifier)
+        if not asset_key or asset_key not in AppConfig.PRESET_ASSETS:
+            raise ValueError(f"지원하지 않는 자산입니다: '{identifier}'. StockAlgo AI는 S&P 500(SnP500) 및 NASDAQ-100(Nasdaq100) 지수 분석 전용입니다.")
 
-        cache_file = CACHE_DIR / f"{ticker.replace('^', 'INDEX_').replace('.', '_')}_daily.csv"
+        preset_info = AppConfig.PRESET_ASSETS[asset_key]
+        asset_name = preset_info["name"]
+        ticker = preset_info["ticker"]
+        csv_path = AppConfig.get_csv_for_preset(asset_key)
+
+        cache_file = CACHE_DIR / f"{asset_key}_daily.csv"
 
         # 2. 캐시 확인 (강제 다운로드가 아닐 때 최신 캐시 우선 로드)
         if not force_download and cache_file.exists():

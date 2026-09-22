@@ -1,7 +1,9 @@
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 from datetime import datetime, timedelta
+from pathlib import Path
 import numpy as np
 import pandas as pd
+import joblib
 from sklearn.model_selection import TimeSeriesSplit, RandomizedSearchCV
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.linear_model import LogisticRegression
@@ -9,15 +11,75 @@ from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 
+from app.config import AppConfig, SAVED_MODELS_DIR
 from app.services.feature_engine import FEATURE_DESCRIPTIONS
 from app.models.schemas import ModelPredictionDetail, FeatureImportanceItem
+
+_ENGINE_CACHE: Dict[str, "ModelEngine"] = {}
 
 class ModelEngine:
     def __init__(self, fast_mode: bool = True):
         self.fast_mode = fast_mode
+        self.asset_key: Optional[str] = None
         self.models: Dict[str, Any] = {}
         self.best_thresholds: Dict[str, float] = {}
         self.eval_metrics: Dict[str, Dict[str, float]] = {}
+        self.features: List[str] = []
+        self.scaler: Any = None
+        self.train_date: str = ""
+        self.total_records: int = 0
+        self.X_test: Optional[pd.DataFrame] = None
+        self.y_test: Optional[pd.Series] = None
+        self.df_test: Optional[pd.DataFrame] = None
+
+    @classmethod
+    def get_pretrained_engine(cls, asset_key: str, force_reload: bool = False) -> "ModelEngine":
+        """
+        saved_models/ 폴더에서 사전 학습된 모델 번들과 스케일러를 로드하여 싱글톤 캐싱
+        """
+        norm_key = AppConfig.resolve_asset_key(asset_key) or "SnP500"
+
+        if not force_reload and norm_key in _ENGINE_CACHE:
+            return _ENGINE_CACHE[norm_key]
+
+        bundle_path = SAVED_MODELS_DIR / f"models_{norm_key}.pkl"
+        scaler_path = SAVED_MODELS_DIR / f"scaler_{norm_key}.pkl"
+
+        if not bundle_path.exists() or not scaler_path.exists():
+            raise FileNotFoundError(
+                f"'{norm_key}'의 사전 학습 모델 파일(.pkl)을 찾을 수 없습니다. "
+                f"model/train_models.py를 실행하여 모델을 생성해 주세요."
+            )
+
+        bundle = joblib.load(bundle_path)
+        scaler = joblib.load(scaler_path)
+
+        engine = cls(fast_mode=False)
+        engine.asset_key = norm_key
+        engine.models = bundle.get("models", {})
+        engine.best_thresholds = bundle.get("best_thresholds", {})
+        engine.eval_metrics = bundle.get("eval_metrics", {})
+        engine.features = bundle.get("features", [])
+        engine.train_date = bundle.get("train_date", "")
+        engine.total_records = bundle.get("total_records", 0)
+        engine.X_test = bundle.get("X_test", None)
+        engine.y_test = bundle.get("y_test", None)
+        engine.df_test = bundle.get("df_test", None)
+        engine.scaler = scaler
+
+        _ENGINE_CACHE[norm_key] = engine
+        return engine
+
+    def scale_features(self, X_raw: pd.DataFrame) -> pd.DataFrame:
+        """
+        사전 학습된 스케일러를 사용하여 입력 피처를 스케일링
+        """
+        if self.scaler is None:
+            raise ValueError("스케일러가 초기화되지 않았습니다.")
+
+        cols = self.features if self.features else X_raw.columns.tolist()
+        scaled = self.scaler.transform(X_raw[cols])
+        return pd.DataFrame(scaled, columns=cols, index=X_raw.index)
 
     def train_models(self, X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.DataFrame, y_test: pd.Series):
         """
