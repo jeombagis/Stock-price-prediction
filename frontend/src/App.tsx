@@ -17,8 +17,10 @@ import { AlertCircle, CheckCircle2, X } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [currentAsset, setCurrentAsset] = useState<string>('SnP500');
-  const [presets, setPresets] = useState<AssetInfo[]>([]);
-  const [popular, setPopular] = useState<AssetInfo[]>([]);
+  const [presets, setPresets] = useState<AssetInfo[]>([
+    { id: 'SnP500', name: 'S&P 500', ticker: '^GSPC', description: '미국 대형주 500개 기업 지수', is_preset: true, category: 'Index' },
+    { id: 'Nasdaq100', name: 'Nasdaq 100', ticker: '^NDX', description: '미국 기술주 100개 기업 지수', is_preset: true, category: 'Index' }
+  ]);
   
   const [prediction, setPrediction] = useState<PredictionOverviewResponse | null>(null);
   const [chartData, setChartData] = useState<ChartResponse | null>(null);
@@ -49,8 +51,9 @@ export const App: React.FC = () => {
     const fetchAssetList = async () => {
       try {
         const res = await api.getAssets();
-        setPresets(res.presets);
-        setPopular(res.popular);
+        if (res.presets && res.presets.length > 0) {
+          setPresets(res.presets);
+        }
       } catch (err) {
         console.error("Failed to load assets:", err);
       }
@@ -125,7 +128,6 @@ export const App: React.FC = () => {
         isLoading={loading}
         isSyncing={isSyncing}
         presets={presets}
-        popular={popular}
       />
 
       {/* 3. Floating Apple Toast Notification */}
