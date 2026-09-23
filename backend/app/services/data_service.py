@@ -1,6 +1,7 @@
 import os
 import glob
 import logging
+import time
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Tuple, Optional
@@ -33,37 +34,44 @@ class DataService:
 
         cache_file = CACHE_DIR / f"{asset_key}_daily.csv"
 
-        # 2. 캐시 확인 (강제 다운로드가 아닐 때 최신 캐시 우선 로드)
-        if not force_download and cache_file.exists():
-            df = DataService._load_local_csv(str(cache_file))
-            if df is not None and len(df) >= 100:
-                logger.info(f"[{asset_key}] 캐시 데이터 로드 완료 ({len(df):,}건)")
-                return df, asset_name, ticker
+        # 2. 캐시 확인 및 최신성 검사 (강제 다운로드가 아닐 때)
+        cached_df = None
+        if cache_file.exists():
+            cached_df = DataService._load_local_csv(str(cache_file))
+
+        if not force_download and cached_df is not None and len(cached_df) >= 100:
+            today_str = datetime.now().strftime('%Y%m%d')
+            last_date_str = str(cached_df['date'].iloc[-1])
+            mtime_age = time.time() - cache_file.stat().st_mtime
+
+            # 1) 오늘 거래일 데이터가 이미 캐시에 존재하거나,
+            # 2) 최근 30분(1800초) 이내에 확인/갱신된 경우 즉시 캐시 반환 (불필요한 외부 API 호출 방지)
+            if last_date_str == today_str or mtime_age < 1800:
+                logger.info(f"[{asset_key}] 최신 캐시 데이터 로드 완료 ({len(cached_df):,}건, 기준일: {last_date_str})")
+                return cached_df, asset_name, ticker
 
         # 3. 로컬 시드 CSV 확인 (캐시가 없고 강제 다운로드가 아닐 때)
-        if not force_download and csv_path and os.path.exists(csv_path):
+        if not force_download and cached_df is None and csv_path and os.path.exists(csv_path):
             df = DataService._load_local_csv(csv_path)
-            logger.info(f"[{asset_key}] 시드 CSV 로드 완료 ({len(df):,}건): {csv_path}")
-            return df, asset_name, ticker
+            if df is not None and len(df) >= 100:
+                logger.info(f"[{asset_key}] 시드 CSV 로드 완료 ({len(df):,}건): {csv_path}")
+                return df, asset_name, ticker
 
-        # 4. Yahoo Finance에서 최신 데이터 다운로드 (force_download 이거나 캐시가 없을 때)
+        # 4. Yahoo Finance에서 최신 데이터 다운로드 (증분 갱신 또는 force_download)
         try:
-            # 증분 업데이트: 캐시가 존재하면 마지막 날짜 이후부터만 다운로드
-            existing_df = None
+            existing_df = cached_df if not force_download else None
             start_date = "1970-01-01"
-            if cache_file.exists() and not force_download:
-                existing_df = DataService._load_local_csv(str(cache_file))
-                if existing_df is not None and len(existing_df) > 0:
-                    last_date_str = str(existing_df['date'].iloc[-1])
-                    try:
-                        last_dt = datetime.strptime(last_date_str, '%Y%m%d')
-                        start_date = (last_dt - timedelta(days=5)).strftime('%Y-%m-%d')
-                        logger.info(f"[{asset_key}] 증분 업데이트: {start_date} 이후 데이터만 다운로드")
-                    except ValueError:
-                        pass
+            if existing_df is not None and len(existing_df) > 0:
+                last_date_str = str(existing_df['date'].iloc[-1])
+                try:
+                    last_dt = datetime.strptime(last_date_str, '%Y%m%d')
+                    start_date = (last_dt - timedelta(days=5)).strftime('%Y-%m-%d')
+                    logger.info(f"[{asset_key}] 증분 업데이트: {start_date} 이후 데이터 다운로드 시도")
+                except ValueError:
+                    pass
 
             new_df = DataService._download_from_yfinance(ticker, start_date=start_date)
-            if new_df is not None and not new_df.empty and len(new_df) >= 5:
+            if new_df is not None and not new_df.empty and len(new_df) >= 1:
                 # 증분 병합
                 if existing_df is not None and not force_download:
                     combined = pd.concat([existing_df, new_df], ignore_index=True)
@@ -76,16 +84,19 @@ class DataService:
                 if len(df) >= 50:
                     # 최신 캐시 저장
                     df.to_csv(cache_file, index=False)
-                    logger.info(f"[{asset_key}] Yahoo Finance 데이터 갱신 완료 ({len(df):,}건)")
+                    logger.info(f"[{asset_key}] Yahoo Finance 데이터 갱신 완료 ({len(df):,}건, 최신일: {df['date'].iloc[-1]})")
                     return df, asset_name, ticker
+            else:
+                # 새 데이터가 없더라도 캐시 파일의 mtime을 갱신하여 30분간 불필요한 재요청 방지
+                if cache_file.exists():
+                    os.utime(cache_file, None)
         except Exception as err:
             logger.error(f"[{asset_key}] yfinance 다운로드 실패: {err}", exc_info=True)
 
         # 다운로드 실패 시 캐시 파일 fallback
-        if cache_file.exists():
-            df = DataService._load_local_csv(str(cache_file))
-            logger.warning(f"[{asset_key}] 다운로드 실패 -> 캐시 fallback ({len(df):,}건)")
-            return df, asset_name, ticker
+        if cached_df is not None and len(cached_df) >= 50:
+            logger.warning(f"[{asset_key}] 다운로드 실패 -> 기존 캐시 fallback ({len(cached_df):,}건)")
+            return cached_df, asset_name, ticker
 
         # 로컬 시드 파일 fallback
         if csv_path and os.path.exists(csv_path):

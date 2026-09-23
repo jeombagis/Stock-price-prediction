@@ -98,3 +98,15 @@ class TestFeatureEngine:
         engine.compute_technical_indicators(sample_stock_df)
         
         assert set(BASE_FEATURE_DESCRIPTIONS.keys()) == original_keys, "Global FEATURE_DESCRIPTIONS was mutated!"
+
+    def test_latest_row_preserved(self, sample_stock_df):
+        """가장 최신 거래일(마지막 행)이 dropna로 인해 유실되지 않고 보존되는지 확인"""
+        engine = FeatureEngine(window_size=5, threshold=0.002)
+        result = engine.compute_technical_indicators(sample_stock_df)
+        
+        last_raw_date = sample_stock_df['date'].iloc[-1]
+        last_processed_date = result['date'].iloc[-1]
+        assert last_processed_date == last_raw_date, (
+            f"최신 거래일이 유실되었습니다! Expected {last_raw_date}, got {last_processed_date}"
+        )
+

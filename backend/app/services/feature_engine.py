@@ -120,10 +120,13 @@ class FeatureEngine:
 
         # Target 생성 (익일 수익률 > Threshold 이면 1, 아니면 0)
         df['target'] = (df['return'].shift(-1) > self.threshold).astype(int)
-        df['Next_Return'] = df['return'].shift(-1)
+        df['Next_Return'] = df['return'].shift(-1).fillna(0.0)
 
         # 결측치 및 무한대 제거
-        df = df.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
+        # 주의: 마지막 행(오늘)은 익일 수익률이 아직 없으므로 Next_Return과 target이 결측치이지만,
+        # 28개 기술적 지표 피처는 모두 온전히 계산되었으므로 피처 컬럼 기준으로 결측치를 제거하여 오늘 행을 온전히 보존합니다.
+        df = df.replace([np.inf, -np.inf], np.nan)
+        df = df.dropna(subset=self.features).reset_index(drop=True)
         return df
 
     def split_and_scale(self, df: pd.DataFrame, train_split: float = AppConfig.TRAIN_SPLIT):
