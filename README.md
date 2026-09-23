@@ -126,8 +126,10 @@ Stock-price-prediction/
 │   │   └── main.tsx               # React 진입점
 │   ├── package.json
 │   └── vite.config.ts
-├── model/                         # ML 모델 학습 및 검증 노트북/스크립트
+├── model/                         # ML 모델 학습, 데이터 추출 및 일일 예측 스크립트
 │   ├── train_models.py            # 사전 학습 모델 생성 및 저장 스크립트
+│   ├── run_daily_prediction.ipynb # 일별 최신 데이터 다운로드 및 익일 주가 예측
+│   ├── Data_extraction.ipynb      # 시드 데이터 다운로드 및 CSV 추출
 │   └── Stock_Classification.ipynb # 탐색적 데이터 분석 및 모델 실험
 ├── saved_models/                  # 사전 학습된 모델 가중치 및 스케일러 (.pkl)
 ├── SnP500_260813.csv              # S&P 500 일봉 원본 데이터셋
