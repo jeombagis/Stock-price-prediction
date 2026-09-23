@@ -153,6 +153,7 @@ class ModelEngine:
                 signal=signal,
                 direction=direction,
                 probability=round(prob, 4),
+                threshold=round(thresh, 4),
                 f1_score=metrics.get('f1_score'),
                 accuracy=metrics.get('accuracy')
             )

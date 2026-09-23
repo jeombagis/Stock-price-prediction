@@ -142,6 +142,8 @@ class BacktestService:
         # 최신 거래일이 맨 위로 오도록 역순 정렬
         records_reversed = list(reversed(records))
 
+        thresholds_dict = {k: round(float(v), 4) for k, v in model_engine.best_thresholds.items()} if hasattr(model_engine, 'best_thresholds') else {}
+
         return BacktestSummaryResponse(
             asset_name=asset_name,
             total_days=actual_lookback,
@@ -149,5 +151,6 @@ class BacktestService:
             hit_ratio_pct=hit_ratio,
             out_of_sample_acc=acc,
             out_of_sample_f1=f1,
+            thresholds=thresholds_dict,
             history=records_reversed
         )

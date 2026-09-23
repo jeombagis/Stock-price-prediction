@@ -54,6 +54,7 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
           const detail = models[name];
           const isUp = detail.signal === 1;
           const probPct = (detail.probability * 100).toFixed(1);
+          const threshPct = detail.threshold != null ? (detail.threshold * 100).toFixed(1) : '50.0';
           const meta = MODEL_INFO[name] || {
             fullName: name,
             desc: '머신러닝 분류 모델',
@@ -100,14 +101,16 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
                   {meta.fullName}
                 </p>
 
-                {/* Probability Bar */}
+                {/* Probability Bar with Threshold Marker */}
                 <div className="space-y-1.5 mb-3">
                   <div className="flex justify-between text-xs">
-                    <span className="text-[#86868b] font-medium">상승 확률</span>
+                    <span className="text-[#86868b] font-medium">
+                      상승 확률 <span className="text-[10px] text-[#0071e3] font-semibold">(기준 {threshPct}%)</span>
+                    </span>
                     <span className="font-mono font-bold text-[#1d1d1f]">{probPct}%</span>
                   </div>
                   <div 
-                    className="h-2 w-full bg-black/[0.05] rounded-full overflow-hidden p-0.5 border border-black/[0.03]"
+                    className="h-2.5 w-full bg-black/[0.05] rounded-full overflow-hidden p-0.5 border border-black/[0.03] relative"
                     role="progressbar"
                     aria-valuenow={detail.probability * 100}
                     aria-valuemin={0}
@@ -119,12 +122,20 @@ export const ModelProbabilities: React.FC<ModelProbabilitiesProps> = ({ models }
                       }`}
                       style={{ width: `${detail.probability * 100}%` }}
                     />
+                    {detail.threshold != null && (
+                      <div 
+                        className="absolute top-0 bottom-0 w-0.5 bg-[#1d1d1f]/60 z-10"
+                        style={{ left: `${detail.threshold * 100}%` }}
+                        title={`최적 임계값: ${threshPct}%`}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Metrics Footer */}
               <div className="pt-2 border-t border-black/[0.04] flex items-center justify-between text-[11px] text-[#86868b] font-medium">
+                <span>임계값: <strong className="text-[#0071e3]">{threshPct}%</strong></span>
                 <span>정확도: <strong className="text-[#1d1d1f]">{detail.accuracy ? `${(detail.accuracy * 100).toFixed(1)}%` : '-'}</strong></span>
                 <span>F1: <strong className="text-[#1d1d1f]">{detail.f1_score ? detail.f1_score.toFixed(3) : '-'}</strong></span>
               </div>

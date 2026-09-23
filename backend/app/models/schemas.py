@@ -21,6 +21,7 @@ class ModelPredictionDetail(BaseModel):
     signal: int = Field(..., description="1: 상승, 0: 하락/보합")
     direction: str = Field(..., description="'상승' 또는 '하락/보합'")
     probability: float = Field(..., description="상승 확률 (0.0 ~ 1.0)")
+    threshold: Optional[float] = Field(None, description="모델별 최적 결정 임계값")
     f1_score: Optional[float] = None
     accuracy: Optional[float] = None
 
@@ -113,6 +114,7 @@ class BacktestSummaryResponse(BaseModel):
     hit_ratio_pct: float
     out_of_sample_acc: float
     out_of_sample_f1: float
+    thresholds: Optional[Dict[str, float]] = Field(None, description="모델별 최적 결정 임계값 맵")
     history: List[BacktestRecord]
 
 

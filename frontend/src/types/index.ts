@@ -22,6 +22,7 @@ export interface ModelPredictionDetail {
   signal: Signal;
   direction: DirectionLabel;
   probability: number;
+  threshold?: number;
   f1_score?: number;
   accuracy?: number;
 }
@@ -85,6 +86,7 @@ export interface BacktestSummaryResponse {
   hit_ratio_pct: number;
   out_of_sample_acc: number;
   out_of_sample_f1: number;
+  thresholds?: Record<string, number>;
   history: BacktestRecord[];
 }
 

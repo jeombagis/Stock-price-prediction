@@ -111,7 +111,7 @@ export const BacktestTable: React.FC<BacktestTableProps> = ({ assetKey, refreshK
             <div>
               <div className="text-[11px] font-semibold text-[#86868b]">마스터 기준</div>
               <div className="text-sm font-bold text-[#1d1d1f] mt-0.5">
-                앙상블 Soft Voting
+                앙상블 Soft Voting {data.thresholds?.Ensemble != null ? `(${(data.thresholds.Ensemble * 100).toFixed(1)}%)` : ''}
               </div>
             </div>
           </div>
@@ -137,39 +137,56 @@ export const BacktestTable: React.FC<BacktestTableProps> = ({ assetKey, refreshK
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-black/[0.06] bg-white/70">
-          <table className="w-full text-left text-xs text-[#1d1d1f]">
-            <thead className="bg-black/[0.03] text-[#86868b] uppercase text-[10px] tracking-wider border-b border-black/[0.05] font-bold">
-              <tr>
-                <th className="py-3 px-3.5">기준 거래일</th>
-                <th className="py-3 px-3.5">예측 목표일</th>
-                <th className="py-3 px-3.5">XGBoost (확률)</th>
-                <th className="py-3 px-3.5">Random Forest</th>
-                <th className="py-3 px-3.5 text-[#0071e3] font-bold">Ensemble (마스터)</th>
-                <th className="py-3 px-3.5 text-right">실제 수익률</th>
-                <th className="py-3 px-3.5 text-center">실제 결과</th>
-                <th className="py-3 px-3.5 text-center">적중 여부</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-black/[0.04] font-mono">
-              {data.history.map((row, idx) => {
-                const isUpActual = row.actual_return_pct > 0;
-                return (
-                  <tr key={idx} className="hover:bg-black/[0.02] transition-colors">
-                    <td className="py-2.5 px-3.5 text-[#86868b]">{row.base_date}</td>
-                    <td className="py-2.5 px-3.5 text-[#1d1d1f] font-semibold">{row.target_date}</td>
-                    <td className="py-2.5 px-3.5 font-medium">
-                      <span className={row.xgb_prob >= 0.5 ? 'text-[#e02424] font-semibold' : 'text-[#059669] font-semibold'}>
-                        {row.xgb_label} ({(row.xgb_prob * 100).toFixed(1)}%)
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3.5 font-medium">
-                      <span className={row.rf_prob >= 0.5 ? 'text-[#e02424] font-semibold' : 'text-[#059669] font-semibold'}>
-                        {row.rf_label} ({(row.rf_prob * 100).toFixed(1)}%)
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3.5 font-bold text-[#0071e3]">
-                      {row.ensemble_label} ({(row.ensemble_prob * 100).toFixed(1)}%)
-                    </td>
+          {(() => {
+            const xgbThresh = data.thresholds?.XGB ?? 0.52;
+            const rfThresh = data.thresholds?.RF ?? 0.52;
+            const ensThresh = data.thresholds?.Ensemble ?? 0.51;
+
+            return (
+              <table className="w-full text-left text-xs text-[#1d1d1f]">
+                <thead className="bg-black/[0.03] text-[#86868b] uppercase text-[10px] tracking-wider border-b border-black/[0.05] font-bold">
+                  <tr>
+                    <th className="py-3 px-3.5">기준 거래일</th>
+                    <th className="py-3 px-3.5">예측 목표일</th>
+                    <th className="py-3 px-3.5">
+                      XGBoost <span className="text-[9px] font-normal text-[#86868b]">({(xgbThresh * 100).toFixed(0)}%)</span>
+                    </th>
+                    <th className="py-3 px-3.5">
+                      Random Forest <span className="text-[9px] font-normal text-[#86868b]">({(rfThresh * 100).toFixed(0)}%)</span>
+                    </th>
+                    <th className="py-3 px-3.5 text-[#0071e3] font-bold">
+                      Ensemble <span className="text-[9px] font-normal text-[#0071e3]/80">({(ensThresh * 100).toFixed(0)}%)</span>
+                    </th>
+                    <th className="py-3 px-3.5 text-right">실제 수익률</th>
+                    <th className="py-3 px-3.5 text-center">실제 결과</th>
+                    <th className="py-3 px-3.5 text-center">적중 여부</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-black/[0.04] font-mono">
+                  {data.history.map((row, idx) => {
+                    const isUpActual = row.actual_return_pct > 0;
+                    const isUpXgb = row.xgb_label === '상승';
+                    const isUpRf = row.rf_label === '상승';
+                    const isUpEns = row.ensemble_label === '상승';
+                    return (
+                      <tr key={idx} className="hover:bg-black/[0.02] transition-colors">
+                        <td className="py-2.5 px-3.5 text-[#86868b]">{row.base_date}</td>
+                        <td className="py-2.5 px-3.5 text-[#1d1d1f] font-semibold">{row.target_date}</td>
+                        <td className="py-2.5 px-3.5 font-medium">
+                          <span className={isUpXgb ? 'text-[#e02424] font-semibold' : 'text-[#059669] font-semibold'}>
+                            {row.xgb_label} ({(row.xgb_prob * 100).toFixed(1)}%)
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3.5 font-medium">
+                          <span className={isUpRf ? 'text-[#e02424] font-semibold' : 'text-[#059669] font-semibold'}>
+                            {row.rf_label} ({(row.rf_prob * 100).toFixed(1)}%)
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3.5 font-bold">
+                          <span className={isUpEns ? 'text-[#e02424]' : 'text-[#059669]'}>
+                            {row.ensemble_label} ({(row.ensemble_prob * 100).toFixed(1)}%)
+                          </span>
+                        </td>
                     <td className={`py-2.5 px-3.5 text-right font-bold ${
                       isUpActual ? 'text-[#e02424]' : 'text-[#059669]'
                     }`}>
@@ -201,6 +218,8 @@ export const BacktestTable: React.FC<BacktestTableProps> = ({ assetKey, refreshK
               })}
             </tbody>
           </table>
+            );
+          })()}
         </div>
       )}
     </div>
