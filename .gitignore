@@ -15,6 +15,7 @@ __pycache__/
 # Data files (raw datasets generated daily/incrementally and runtime cache)
 *.csv
 **/*.csv
+!csv/.gitkeep
 
 # macOS
 *.DS_Store

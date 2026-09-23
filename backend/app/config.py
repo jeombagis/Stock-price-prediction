@@ -4,7 +4,9 @@ from pathlib import Path
 
 # Base Paths
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = PROJECT_ROOT
+CSV_DIR = PROJECT_ROOT / "csv"
+CSV_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR = CSV_DIR
 SAVED_MODELS_DIR = PROJECT_ROOT / "saved_models"
 CACHE_DIR = PROJECT_ROOT / "backend" / "data_cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -53,9 +55,15 @@ class AppConfig:
     def get_csv_for_preset(cls, asset_key: str) -> str | None:
         norm_key = cls.resolve_asset_key(asset_key)
         if norm_key and norm_key in cls.PRESET_ASSETS:
-            pattern = str(DATA_DIR / cls.PRESET_ASSETS[norm_key]["csv_pattern"])
+            # 1. csv/ 디렉토리 우선 탐색
+            pattern = str(CSV_DIR / cls.PRESET_ASSETS[norm_key]["csv_pattern"])
             matches = glob.glob(pattern)
             if matches:
                 return sorted(matches)[-1]
+            # 2. 프로젝트 루트 fallback
+            pattern_root = str(PROJECT_ROOT / cls.PRESET_ASSETS[norm_key]["csv_pattern"])
+            matches_root = glob.glob(pattern_root)
+            if matches_root:
+                return sorted(matches_root)[-1]
         return None
 

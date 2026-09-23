@@ -132,8 +132,7 @@ Stock-price-prediction/
 │   ├── Data_extraction.ipynb      # 시드 데이터 다운로드 및 CSV 추출
 │   └── Stock_Classification.ipynb # 탐색적 데이터 분석 및 모델 실험
 ├── saved_models/                  # 사전 학습된 모델 가중치 및 스케일러 (.pkl)
-├── SnP500_260813.csv              # S&P 500 일봉 원본 데이터셋
-├── Nasdaq100_260813.csv           # NASDAQ-100 일봉 원본 데이터셋
+├── csv/                           # 일봉 원본 데이터셋 저장 디렉토리 (*.csv)
 ├── start.sh                       # 원클릭 통합 실행 스크립트
 ├── requirements.txt               # 프로젝트 루트 패키지 의존성
 └── README.md

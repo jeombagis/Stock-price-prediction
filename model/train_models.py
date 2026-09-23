@@ -22,6 +22,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+CSV_DIR = PROJECT_ROOT / "csv"
 SAVED_MODELS_DIR = PROJECT_ROOT / "saved_models"
 SAVED_MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -135,8 +136,11 @@ def train_asset_models(asset_key: str, info: dict):
     print(f"🚀 [{info['name']}] 정규 머신러닝 모델 학습 시작...")
     print(f"=======================================================")
 
-    pattern = str(PROJECT_ROOT / info['file_pattern'])
+    pattern = str(CSV_DIR / info['file_pattern'])
     matches = glob.glob(pattern)
+    if not matches:
+        pattern = str(PROJECT_ROOT / info['file_pattern'])
+        matches = glob.glob(pattern)
     if not matches:
         raise FileNotFoundError(f"{info['file_pattern']} 원천 데이터 CSV 파일을 찾을 수 없습니다.")
     csv_file = sorted(matches)[-1]
