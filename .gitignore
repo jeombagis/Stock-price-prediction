@@ -12,8 +12,9 @@ __pycache__/
 .env
 .venv/
 
-# Data cache (generated at runtime)
-backend/data_cache/*.csv
+# Data files (raw datasets generated daily/incrementally and runtime cache)
+*.csv
+**/*.csv
 
 # macOS
 *.DS_Store
