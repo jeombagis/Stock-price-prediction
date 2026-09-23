@@ -121,6 +121,7 @@ class FeatureEngine:
         # Target 생성 (익일 수익률 > Threshold 이면 1, 아니면 0)
         df['target'] = (df['return'].shift(-1) > self.threshold).astype(int)
         df['Next_Return'] = df['return'].shift(-1).fillna(0.0)
+        df['target_date'] = df['date'].shift(-1)
 
         # 결측치 및 무한대 제거
         # 주의: 마지막 행(오늘)은 익일 수익률이 아직 없으므로 Next_Return과 target이 결측치이지만,

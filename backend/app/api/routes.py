@@ -217,7 +217,8 @@ def get_backtest(
         model_engine=pipeline['model_engine'],
         df_test=pipeline['df_test'],
         X_test=pipeline['X_test'],
-        lookback_days=days
+        lookback_days=days,
+        processed_df=pipeline.get('processed_df')
     )
     return summary
 

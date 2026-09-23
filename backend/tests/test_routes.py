@@ -125,12 +125,34 @@ class TestFullPipelineIntegration:
         assert data["features"][0]["importance"] >= 0.0
 
     def test_backtest_success(self):
+        pred_res = client.get("/api/predict", params={"asset": "SnP500"})
+        assert pred_res.status_code == 200
+        pred_base_date = pred_res.json()["base_date"]
+
         response = client.get("/api/backtest", params={"asset": "SnP500", "days": 20})
         assert response.status_code == 200
         data = response.json()
         assert data["total_days"] > 0
         assert 0.0 <= data["hit_ratio_pct"] <= 100.0
         assert len(data["history"]) > 0
+
+        # 백테스트의 가장 최신 결과는 예측의 base_date(직전 거래일 종가)와 정확히 맞닿아야 함 (과거 정체 버그 방지)
+        latest_record = data["history"][0]
+        assert latest_record["target_date"] == pred_base_date
+
+    def test_backtest_nasdaq100_and_lookback_days(self):
+        """Nasdaq100 최신 날짜 동기화 및 다양한 lookback_days(10, 30, 60) 동작 검증"""
+        pred_res = client.get("/api/predict", params={"asset": "Nasdaq100"})
+        assert pred_res.status_code == 200
+        pred_base_date = pred_res.json()["base_date"]
+
+        for d in [10, 30, 60]:
+            response = client.get("/api/backtest", params={"asset": "Nasdaq100", "days": d})
+            assert response.status_code == 200
+            data = response.json()
+            assert data["total_days"] == d
+            assert len(data["history"]) == d
+            assert data["history"][0]["target_date"] == pred_base_date
 
     def test_retrain_different_window_size_graceful(self):
         """window_size!=5 요청 시 런타임 오류 없이 안전하게 5로 처리되어 성공하는지 검증"""

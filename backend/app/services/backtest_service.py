@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import pandas as pd
 from app.models.schemas import BacktestRecord, BacktestSummaryResponse
@@ -13,23 +13,80 @@ class BacktestService:
     def generate_backtest_summary(
         asset_name: str,
         model_engine: ModelEngine,
-        df_test: pd.DataFrame,
-        X_test: pd.DataFrame,
-        lookback_days: int = 20
+        df_test: Optional[pd.DataFrame] = None,
+        X_test: Optional[pd.DataFrame] = None,
+        lookback_days: int = 20,
+        processed_df: Optional[pd.DataFrame] = None
     ) -> BacktestSummaryResponse:
         """
         최근 lookback_days 거래일 동안의 일별 AI 예측과 실제 주가 등락 결과를 비교하고 적중률을 계산합니다.
+        processed_df가 주어지면 가장 최신의 완료된 실제 거래일 데이터를 동적으로 슬라이싱하여 백테스팅을 산출합니다.
         """
-        actual_lookback = min(lookback_days, len(df_test))
-        recent_df = df_test.tail(actual_lookback).reset_index(drop=True)
-        recent_X = X_test.tail(actual_lookback).reset_index(drop=True)
+        # 1. 평가 대상 데이터셋 및 피처 준비
+        if processed_df is not None and not processed_df.empty:
+            # 마지막 행은 당일/가장 최근 거래일로 아직 익일 종가(수익률)가 미확정 상태이므로 제외
+            # 익일 결과가 확정된 완료 거래일(iloc[:-1]) 중 최근 lookback_days 거래일 추출
+            completed_df = processed_df.iloc[:-1] if len(processed_df) > 1 else processed_df
+            actual_lookback = min(lookback_days, len(completed_df))
+            recent_df = completed_df.tail(actual_lookback).copy().reset_index(drop=True)
+            feat_cols = model_engine.features if model_engine.features else [c for c in recent_df.columns if c in model_engine.models]
+            recent_X = model_engine.scale_features(recent_df[feat_cols]).reset_index(drop=True)
+        elif df_test is not None and not df_test.empty and X_test is not None and not X_test.empty:
+            actual_lookback = min(lookback_days, len(df_test))
+            recent_df = df_test.tail(actual_lookback).copy().reset_index(drop=True)
+            recent_X = X_test.tail(actual_lookback).copy().reset_index(drop=True)
+        else:
+            return BacktestSummaryResponse(
+                asset_name=asset_name,
+                total_days=0,
+                hit_count=0,
+                hit_ratio_pct=0.0,
+                out_of_sample_acc=0.0,
+                out_of_sample_f1=0.0,
+                history=[]
+            )
+
+        if actual_lookback == 0:
+            return BacktestSummaryResponse(
+                asset_name=asset_name,
+                total_days=0,
+                hit_count=0,
+                hit_ratio_pct=0.0,
+                out_of_sample_acc=0.0,
+                out_of_sample_f1=0.0,
+                history=[]
+            )
+
+        # 2. 모델별 배치 예측 수행 (루프 오버헤드 최소화)
+        xgb_model = model_engine.models.get('XGB')
+        rf_model = model_engine.models.get('RF')
+        lgbm_model = model_engine.models.get('LGBM')
+        ensemble_model = model_engine.models.get('Ensemble')
+
+        xgb_probs = xgb_model.predict_proba(recent_X)[:, 1] if xgb_model is not None else [0.5] * actual_lookback
+        rf_probs = rf_model.predict_proba(recent_X)[:, 1] if rf_model is not None else [0.5] * actual_lookback
+        lgbm_probs = lgbm_model.predict_proba(recent_X)[:, 1] if lgbm_model is not None else [None] * actual_lookback
+        ens_probs = ensemble_model.predict_proba(recent_X)[:, 1] if ensemble_model is not None else xgb_probs
+
+        xgb_thresh = model_engine.best_thresholds.get('XGB', 0.5)
+        rf_thresh = model_engine.best_thresholds.get('RF', 0.5)
+        lgbm_thresh = model_engine.best_thresholds.get('LGBM', 0.5)
+        ens_thresh = model_engine.best_thresholds.get('Ensemble', 0.5)
 
         records: List[BacktestRecord] = []
         hit_count = 0
 
-        for i in range(len(recent_df)):
+        for i in range(actual_lookback):
             row = recent_df.iloc[i]
-            feat = recent_X.iloc[[i]]
+            xgb_prob = float(xgb_probs[i])
+            rf_prob = float(rf_probs[i])
+            lgbm_prob = float(lgbm_probs[i]) if lgbm_probs[i] is not None else None
+            ensemble_prob = float(ens_probs[i])
+
+            xgb_label = "상승" if xgb_prob >= xgb_thresh else "하락"
+            rf_label = "상승" if rf_prob >= rf_thresh else "하락"
+            lgbm_label = ("상승" if lgbm_prob >= lgbm_thresh else "하락") if lgbm_prob is not None else None
+            ensemble_label = "상승" if ensemble_prob >= ens_thresh else "하락"
 
             # 날짜 포맷
             raw_date = str(row['date']).replace('-', '')
@@ -38,23 +95,16 @@ class BacktestService:
             except Exception:
                 base_dt = datetime.now()
 
-            target_dt = _next_trading_day(base_dt.date())
+            # target_date 결정: 데이터셋에 target_date 컬럼이 있으면 우선 적용
+            target_date_str = None
+            if 'target_date' in row and pd.notnull(row['target_date']):
+                raw_target = str(row['target_date']).replace('-', '').split('.')[0]
+                if len(raw_target) == 8:
+                    target_date_str = f"{raw_target[:4]}-{raw_target[4:6]}-{raw_target[6:]}"
 
-            # 모델별 예측 확률 및 임계값 적용 (LGBM 포함 통일)
-            xgb_prob = float(model_engine.models['XGB'].predict_proba(feat)[0][1]) if 'XGB' in model_engine.models else 0.5
-            rf_prob = float(model_engine.models['RF'].predict_proba(feat)[0][1]) if 'RF' in model_engine.models else 0.5
-            lgbm_prob = float(model_engine.models['LGBM'].predict_proba(feat)[0][1]) if 'LGBM' in model_engine.models else None
-            ensemble_prob = float(model_engine.models['Ensemble'].predict_proba(feat)[0][1]) if 'Ensemble' in model_engine.models else xgb_prob
-
-            xgb_thresh = model_engine.best_thresholds.get('XGB', 0.5)
-            rf_thresh = model_engine.best_thresholds.get('RF', 0.5)
-            lgbm_thresh = model_engine.best_thresholds.get('LGBM', 0.5)
-            ens_thresh = model_engine.best_thresholds.get('Ensemble', 0.5)
-
-            xgb_label = "상승" if xgb_prob >= xgb_thresh else "하락"
-            rf_label = "상승" if rf_prob >= rf_thresh else "하락"
-            lgbm_label = ("상승" if lgbm_prob >= lgbm_thresh else "하락") if lgbm_prob is not None else None
-            ensemble_label = "상승" if ensemble_prob >= ens_thresh else "하락"
+            if not target_date_str:
+                target_dt = _next_trading_day(base_dt.date())
+                target_date_str = datetime.combine(target_dt, datetime.min.time()).strftime('%Y-%m-%d')
 
             # 실제 등락 결과
             actual_ret = float(row.get('Next_Return', 0.0))
@@ -69,7 +119,7 @@ class BacktestService:
 
             records.append(BacktestRecord(
                 base_date=base_dt.strftime('%Y-%m-%d'),
-                target_date=datetime.combine(target_dt, datetime.min.time()).strftime('%Y-%m-%d'),
+                target_date=target_date_str,
                 xgb_label=xgb_label,
                 xgb_prob=round(xgb_prob, 4),
                 rf_label=rf_label,

@@ -139,7 +139,7 @@ def train_asset_models(asset_key: str, info: dict):
     matches = glob.glob(pattern)
     if not matches:
         raise FileNotFoundError(f"{info['file_pattern']} 원천 데이터 CSV 파일을 찾을 수 없습니다.")
-    csv_file = max(matches, key=os.path.getctime)
+    csv_file = sorted(matches)[-1]
     print(f"📁 원천 데이터 파일: {csv_file}")
 
     df = load_and_preprocess(Path(csv_file))

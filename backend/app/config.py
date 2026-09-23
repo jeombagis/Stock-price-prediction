@@ -56,5 +56,6 @@ class AppConfig:
             pattern = str(DATA_DIR / cls.PRESET_ASSETS[norm_key]["csv_pattern"])
             matches = glob.glob(pattern)
             if matches:
-                return max(matches, key=os.path.getctime)
+                return sorted(matches)[-1]
         return None
+
